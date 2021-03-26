@@ -1,0 +1,11 @@
+name: CodeLock
+version: 1.0.0
+main: io.github.maxijonson.CodeLock
+author: MaxiJonson
+website: https://github.com/maxijonson/code-lock
+api-version: 1.16
+
+commands:
+  codelock:
+    description: The CodeLock plugin command. Use '/codelock help' for more information
+    usage: /<command>
