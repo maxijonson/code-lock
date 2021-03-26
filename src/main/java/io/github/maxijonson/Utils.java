@@ -3,11 +3,24 @@ package io.github.maxijonson;
 import java.util.HashMap;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 public class Utils {
+
+    /**
+     * Creates a unique ID for a block based on its position and world. It does not
+     * temper with the the block itself, the resulting ID should be kept somewhere
+     * for future use.
+     * 
+     * @param block the block to get the ID
+     * @return
+     */
+    public static String getBlockId(Block block) {
+        return String.format("%s:%d-%d-%d", block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+    }
 
     public static class Meta {
         private static HashMap<String, NamespacedKey> keys = new HashMap<>();

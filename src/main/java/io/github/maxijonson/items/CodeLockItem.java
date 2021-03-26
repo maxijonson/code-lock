@@ -15,7 +15,6 @@ public class CodeLockItem extends Item {
     public static String NSK_CODE = ID + ".code";
 
     private static ItemMeta defaultMeta = null;
-    public int test = 0;
 
     public CodeLockItem() {
         this(1);
@@ -36,7 +35,6 @@ public class CodeLockItem extends Item {
             defaultMeta.setLore(lore);
 
             Utils.Meta.setCustomData(defaultMeta, NSK_CODE, -1);
-
         }
 
         this.setItemMeta(defaultMeta);

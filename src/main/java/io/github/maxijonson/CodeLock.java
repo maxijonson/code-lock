@@ -1,5 +1,7 @@
 package io.github.maxijonson;
 
+import java.io.File;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 import io.github.maxijonson.commands.CommandManager;
@@ -13,12 +15,18 @@ import io.github.maxijonson.events.PlaceLockEvent;
  */
 public class CodeLock extends JavaPlugin {
     private static CodeLock instance = null;
+    private static File dataFolder = null;
 
     @Override
     public void onEnable() {
+        // Get instance of plugin
         instance = this;
 
-        getLogger().info("CodeLock is enabled");
+        // Prepare data folder
+        dataFolder = getDataFolder();
+        if (!dataFolder.exists() || !dataFolder.isDirectory()) {
+            dataFolder.mkdirs();
+        }
 
         // Init events
         getServer().getPluginManager().registerEvents(new PlaceLockEvent(), this);
@@ -30,10 +38,13 @@ public class CodeLock extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getLogger().info("CodeLock is disabled");
     }
 
     public static CodeLock getInstance() {
         return instance;
+    }
+
+    public static File getDataFolderPath() {
+        return dataFolder;
     }
 }
