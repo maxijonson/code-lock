@@ -2,7 +2,7 @@ package io.github.maxijonson.events;
 
 import java.util.ArrayList;
 
-import org.bukkit.Color;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -15,11 +15,18 @@ import io.github.maxijonson.data.Data;
 import io.github.maxijonson.items.CodeLockItem;
 import io.github.maxijonson.items.Item;
 
+/**
+ * Event fired when attempting to place a lock. The event will validate that the
+ * targeted entity can be locked and will register the target as a LockedBlock,
+ * if it can.
+ */
 public class PlaceLockEvent implements Listener {
-    private static ArrayList<Material> MATERIAL_BLACKLIST = new ArrayList<Material>() {
-        /**
-         *
-         */
+
+    /**
+     * Materials that could be valid by the default lockable materials criteria but
+     * should be excluded from being lockable.
+     */
+    private static final ArrayList<Material> MATERIAL_BLACKLIST = new ArrayList<Material>() {
         private static final long serialVersionUID = 1L;
 
         {
@@ -34,14 +41,15 @@ public class PlaceLockEvent implements Listener {
             add(Material.WARPED_FENCE);
         }
     };
-    private static ArrayList<Material> MATERIAL_WHITELIST = new ArrayList<Material>() {
-        /**
-         *
-         */
+
+    /**
+     * Materials that are not lockable by default but that should be.
+     */
+    private static final ArrayList<Material> MATERIAL_WHITELIST = new ArrayList<Material>() {
         private static final long serialVersionUID = 1L;
 
         {
-            // TODO: Add blacklisted Materials as they are discovered
+            // TODO: Add whitelisted Materials as they are discovered
         }
     };
 
@@ -72,7 +80,7 @@ public class PlaceLockEvent implements Listener {
 
             if (!Data.getInstance().addPlayer(player)) {
                 player.sendMessage(new String[] { "Right click the locked block to set the code",
-                        "You can set a default code with " + Color.AQUA + "/codelock default <4-pin>" });
+                        "You can set a default code with " + ChatColor.AQUA + "/codelock default <4-pin>" });
             }
         }
     }

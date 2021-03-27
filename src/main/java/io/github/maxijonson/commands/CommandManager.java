@@ -3,20 +3,33 @@ package io.github.maxijonson.commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.bukkit.Color;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * Manages every command available for the plugin. It delegates the commands to
+ * the appropriate classes
+ */
 public class CommandManager implements CommandExecutor {
 
-    public static ArrayList<CodeLockCommand> commands = new ArrayList<>();
+    private static ArrayList<CodeLockCommand> commands = new ArrayList<>();
 
+    /**
+     * Registers available commands
+     */
     public static void init() {
         commands.add(GiveCommand.getInstance());
+        commands.add(SaveCommand.getInstance());
+        commands.add(LoadCommand.getInstance());
+        commands.add(HelpCommand.getInstance());
     }
 
+    /**
+     * Listens to every commands and dispatches them to the appropriate class
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player)) {
@@ -39,12 +52,16 @@ public class CommandManager implements CommandExecutor {
 
         if (command != null) {
             if (!command.onCommand(player, cmd, label, Arrays.copyOfRange(args, 1, args.length))) {
-                sender.sendMessage(Color.RED + command.getName() + "usage: /codelock " + command.getUsage());
+                sender.sendMessage(ChatColor.RED + command.getName() + "usage: /codelock " + command.getUsage());
             }
             return true;
         }
 
         return false;
+    }
+
+    public static ArrayList<CodeLockCommand> getCommands() {
+        return commands;
     }
 
 }

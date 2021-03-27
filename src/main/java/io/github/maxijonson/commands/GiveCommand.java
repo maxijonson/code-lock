@@ -1,6 +1,6 @@
 package io.github.maxijonson.commands;
 
-import org.bukkit.Color;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
@@ -9,11 +9,14 @@ import io.github.maxijonson.Utils;
 import io.github.maxijonson.items.CodeLockItem;
 import io.github.maxijonson.items.Item;
 
+/**
+ * Gives the player a codelock
+ */
 public class GiveCommand extends CodeLockCommand {
     private static GiveCommand instance = null;
 
     private GiveCommand() {
-        super("give", "give [amount]");
+        super("give", "give [amount]", "gives a code lock with an optional amount (default 1)");
     }
 
     @Override
@@ -24,7 +27,7 @@ public class GiveCommand extends CodeLockCommand {
             try {
                 amount = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                player.sendMessage(Color.RED + "The amount must be a number");
+                player.sendMessage(ChatColor.RED + "The amount must be a number");
                 return true;
             }
         }
