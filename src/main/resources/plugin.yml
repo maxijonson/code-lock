@@ -4,8 +4,12 @@ main: io.github.maxijonson.CodeLock
 author: MaxiJonson
 website: https://github.com/maxijonson/code-lock
 api-version: 1.16
+api: []
 
 commands:
   codelock:
+    aliases: []
+    tab-complete: 0
+    send-namespaced: false
     description: The CodeLock plugin command. Use '/codelock help' for more information
-    usage: /<command>
+    usage: /<command> help

@@ -1,43 +1,21 @@
 package io.github.maxijonson.commands;
 
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataType;
 
-import io.github.maxijonson.Utils;
+import io.github.maxijonson.exceptions.CommandException;
 import io.github.maxijonson.items.CodeLockItem;
-import io.github.maxijonson.items.Item;
 
 /**
  * Gives the player a codelock
  */
-public class GiveCommand extends CodeLockCommand {
+public class GiveCommand extends CodeLockCommand implements PlayerCommand, ServerCommand {
     private static GiveCommand instance = null;
 
     private GiveCommand() {
-        super("give", "give [amount]", "gives a code lock with an optional amount (default 1)");
-    }
-
-    @Override
-    boolean onCommand(Player player, Command cmd, String label, String[] args) {
-        int amount = 1;
-
-        if (args.length > 0 && args[0] != null) {
-            try {
-                amount = Integer.parseInt(args[0]);
-            } catch (NumberFormatException e) {
-                player.sendMessage(ChatColor.RED + "The amount must be a number");
-                return true;
-            }
-        }
-
-        CodeLockItem codeLock = new CodeLockItem(amount);
-        player.getInventory().addItem(codeLock);
-        player.sendMessage(Integer.toString(amount) + " code lock given with ID '"
-                + Utils.Meta.getCustomData(codeLock.getItemMeta(), Item.NSK_ID, PersistentDataType.STRING) + "'");
-
-        return true;
+        super("give", "give [player] [amount]", "gives a code lock", "give <player> [amount]");
     }
 
     public static GiveCommand getInstance() {
@@ -46,4 +24,78 @@ public class GiveCommand extends CodeLockCommand {
         }
         return instance;
     }
+
+    private void giveCodeLock(Player player, int amount) {
+        CodeLockItem codeLock = new CodeLockItem(amount);
+        player.getInventory().addItem(codeLock);
+    }
+
+    @Override
+    public boolean onCommand(Player player, Command cmd, String label, String[] args) throws CommandException {
+        int amount = 1;
+        Player receiver = player;
+
+        // Either a player or an amount
+        if (args.length == 1) {
+            try {
+                amount = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                receiver = Bukkit.getPlayer(args[0]);
+
+                if (receiver == null) {
+                    throw new CommandException("That player does not exist or isn't online");
+                }
+            }
+        }
+
+        // format should be: give player amount
+        if (args.length == 2) {
+            receiver = Bukkit.getPlayer(args[0]);
+
+            if (receiver == null) {
+                throw new CommandException("That player does not exist or isn't online");
+            }
+
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                throw new CommandException("The amount must be a number");
+            }
+        }
+
+        giveCodeLock(receiver, amount);
+        return true;
+    }
+
+    @Override
+    public boolean onCommand(ConsoleCommandSender server, Command cmd, String label, String[] args)
+            throws CommandException {
+        int amount = 1;
+        Player receiver = null;
+
+        if (args.length == 0) {
+            throw new CommandException("Must specify the player");
+        }
+        if (args.length > 2) {
+            throw new CommandException("Too many arguments");
+        }
+
+        receiver = Bukkit.getPlayer(args[0]);
+
+        if (receiver == null) {
+            throw new CommandException("That player does not exist or isn't online");
+        }
+
+        if (args.length == 2) {
+            try {
+                amount = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                throw new CommandException("The amount must be a number");
+            }
+        }
+
+        giveCodeLock(receiver, amount);
+        return true;
+    }
+
 }

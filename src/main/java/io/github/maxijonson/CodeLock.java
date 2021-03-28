@@ -36,8 +36,9 @@ public class CodeLock extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlaceLockEvent(), this);
 
         // Init commands
-        CommandManager.init();
-        getCommand("codelock").setExecutor(new CommandManager());
+        CommandManager commandManager = CommandManager.getInstance();
+        commandManager.init();
+        this.getCommand("codelock").setExecutor(commandManager);
     }
 
     @Override

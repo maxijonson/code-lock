@@ -2,6 +2,8 @@ package io.github.maxijonson.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import io.github.maxijonson.data.Data;
@@ -9,20 +11,30 @@ import io.github.maxijonson.data.Data;
 /**
  * Calls the `load` method of the Data instance
  */
-public class LoadCommand extends CodeLockCommand {
+public class LoadCommand extends CodeLockCommand implements PlayerCommand, ServerCommand {
     private static LoadCommand instance = null;
 
     private LoadCommand() {
         super("load", "load", "Loads the plugin data (overwrites the current data)");
     }
 
-    @Override
-    boolean onCommand(Player player, Command cmd, String label, String[] args) {
+    private void load(CommandSender sender) {
         if (Data.getInstance().load()) {
-            player.sendMessage(ChatColor.GREEN + "Data loaded!");
+            sender.sendMessage(ChatColor.GREEN + "Data loaded!");
         } else {
-            player.sendMessage(ChatColor.RED + "Data could not be loaded.");
+            sender.sendMessage(ChatColor.RED + "Data could not be loaded.");
         }
+    }
+
+    @Override
+    public boolean onCommand(Player player, Command cmd, String label, String[] args) {
+        load(player);
+        return true;
+    }
+
+    @Override
+    public boolean onCommand(ConsoleCommandSender server, Command cmd, String label, String[] args) {
+        load(server);
         return true;
     }
 

@@ -1,51 +1,35 @@
 package io.github.maxijonson.commands;
 
-import org.bukkit.command.Command;
-import org.bukkit.entity.Player;
-
 /**
  * Base class for a command
  */
-public abstract class CodeLockCommand {
-    /**
-     * Name of the command (/codelock <name>)
-     */
+public abstract class CodeLockCommand implements BaseCommand {
     private String name;
-
-    /**
-     * Usage for the command, excluding the leading "/codelock"
-     */
-    private String usage;
-
-    /**
-     * Informative description on what the command does
-     */
+    private String playerUsage;
+    private String serverUsage;
     private String description;
 
-    public CodeLockCommand(String name, String usage, String description) {
+    public CodeLockCommand(String name, String usage, String description, String serverUsage) {
         this.name = name;
-        this.usage = usage;
+        this.playerUsage = usage;
+        this.serverUsage = serverUsage;
         this.description = description;
     }
 
-    /**
-     * Executes the command
-     * 
-     * @param player the player associated with the event
-     * @param cmd    the issued command object
-     * @param label  label of the command
-     * @param args   additionnal arguments with the command ("/codelock <command>
-     *               [args]")
-     * @return
-     */
-    abstract boolean onCommand(Player player, Command cmd, String label, String[] args);
+    public CodeLockCommand(String name, String usage, String description) {
+        this(name, usage, description, usage);
+    }
 
     public String getName() {
         return name;
     }
 
-    public String getUsage() {
-        return usage;
+    public String getPlayerUsage() {
+        return playerUsage;
+    }
+
+    public String getServerUsage() {
+        return serverUsage;
     }
 
     public String getDescription() {
