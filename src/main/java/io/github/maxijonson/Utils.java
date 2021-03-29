@@ -15,6 +15,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.Bisected.Half;
+import org.bukkit.block.data.type.Chest;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -27,10 +28,11 @@ public class Utils {
 
     public static class Entity {
         /**
-         * Useful for entities that span over more than 1 block. Will get the lower-most
-         * block of the entity.
+         * Useful for entities that span over more than 1 block. This method will return
+         * the same block wherever the player interacts with it.
          * 
          * @see Bisected
+         * @see Chest
          * @param block
          * @return
          */
@@ -40,6 +42,30 @@ public class Utils {
                 Door door = (Door) b.getBlockData();
                 if (door.getHalf() == Half.TOP) {
                     b = b.getRelative(BlockFace.DOWN);
+                }
+            }
+            if (block.getBlockData() instanceof Chest) {
+                Chest chest = (Chest) b.getBlockData();
+                System.out.println(chest.getFacing());
+
+                if (chest.getType() == Chest.Type.RIGHT) {
+                    BlockFace face = chest.getFacing();
+                    switch (face) {
+                    case NORTH:
+                        b = b.getRelative(BlockFace.WEST);
+                        break;
+                    case WEST:
+                        b = b.getRelative(BlockFace.SOUTH);
+                        break;
+                    case SOUTH:
+                        b = b.getRelative(BlockFace.EAST);
+                        break;
+                    case EAST:
+                        b = b.getRelative(BlockFace.NORTH);
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
             return b;
