@@ -40,6 +40,8 @@ public class CommandManager implements CommandExecutor {
         registerCommand(GiveCommand.getInstance());
         registerCommand(SaveCommand.getInstance());
         registerCommand(LoadCommand.getInstance());
+        registerCommand(ClearDataCommand.getInstance());
+        registerCommand(UsageCommand.getInstance());
         registerCommand(HelpCommand.getInstance());
     }
 

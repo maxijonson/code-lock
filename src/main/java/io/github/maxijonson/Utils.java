@@ -11,6 +11,11 @@ import org.bukkit.Chunk;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.Bisected.Half;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,6 +24,27 @@ import org.bukkit.persistence.PersistentDataType;
 import io.github.maxijonson.data.LockedBlock;
 
 public class Utils {
+
+    public static class Entity {
+        /**
+         * Useful for entities that span over more than 1 block. Will get the lower-most
+         * block of the entity.
+         * 
+         * @see Bisected
+         * @param block
+         * @return
+         */
+        public static Block getWorkableBlock(Block block) {
+            Block b = block;
+            if (block.getBlockData() instanceof Door) {
+                Door door = (Door) b.getBlockData();
+                if (door.getHalf() == Half.TOP) {
+                    b = b.getRelative(BlockFace.DOWN);
+                }
+            }
+            return b;
+        }
+    }
 
     public static class FS {
         /**
@@ -77,15 +103,23 @@ public class Utils {
         }
 
         public static String createPositionalId(World world, int x, int y, int z, String type) {
-            return createPositionalId(world.getEnvironment().name(), x, y, z, type);
+            return createPositionalId(getWorldId(world), x, y, z, type);
         }
 
         public static String getLockedBlockId(LockedBlock block) {
             return createPositionalId(block.getWorld(), block.getX(), block.getY(), block.getZ(), TYPE_LOCKEDBLOCK);
         }
 
+        public static String getLockedBlockId(Block block) {
+            return createPositionalId(block.getWorld(), block.getX(), block.getY(), block.getZ(), TYPE_LOCKEDBLOCK);
+        }
+
         public static String getChunkId(Chunk chunk) {
             return createPositionalId(chunk.getWorld(), chunk.getX(), 0, chunk.getZ(), TYPE_CHUNK);
+        }
+
+        public static String getWorldId(World world) {
+            return world.getEnvironment().name();
         }
     }
 

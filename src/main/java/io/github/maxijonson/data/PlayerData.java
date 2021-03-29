@@ -13,8 +13,8 @@ public class PlayerData extends DataEntity<PlayerData> {
     /** Unique identifier */
     private UUID uuid;
 
-    /** The default code to use when placing a code lock. -1 for none. */
-    private int defaultCode = -1;
+    /** The default code to use when placing a code lock. null for none. */
+    private String defaultCode = null;
 
     public PlayerData(UUID uuid) {
         this.uuid = uuid;
@@ -24,11 +24,11 @@ public class PlayerData extends DataEntity<PlayerData> {
         return uuid;
     }
 
-    public int getDefaultCode() {
+    public String getDefaultCode() {
         return defaultCode;
     }
 
-    public void setDefaultCode(int defaultCode) {
+    public void setDefaultCode(String defaultCode) {
         this.defaultCode = defaultCode;
     }
 

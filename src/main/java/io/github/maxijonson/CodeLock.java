@@ -6,6 +6,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import io.github.maxijonson.commands.CommandManager;
 import io.github.maxijonson.data.Data;
+import io.github.maxijonson.events.AuthorizeEvent;
+import io.github.maxijonson.events.GUIClickEvent;
+import io.github.maxijonson.events.OpenGUIEvent;
 import io.github.maxijonson.events.PlaceLockEvent;
 
 /**
@@ -29,11 +32,13 @@ public class CodeLock extends JavaPlugin {
             dataFolder.mkdirs();
         }
 
-        // Load Data TODO: enable the line below when ready
         Data.getInstance().load();
 
         // Init events
         getServer().getPluginManager().registerEvents(new PlaceLockEvent(), this);
+        getServer().getPluginManager().registerEvents(new AuthorizeEvent(), this);
+        getServer().getPluginManager().registerEvents(new OpenGUIEvent(), this);
+        getServer().getPluginManager().registerEvents(new GUIClickEvent(), this);
 
         // Init commands
         CommandManager commandManager = CommandManager.getInstance();
@@ -43,7 +48,6 @@ public class CodeLock extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Save data TODO: enable the line below when ready
         Data.getInstance().save();
     }
 

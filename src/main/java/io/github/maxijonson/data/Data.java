@@ -39,7 +39,7 @@ public class Data {
      * 
      * HashMap<WORLD_NAME, HashMap<CHUNK_ID, HashMap<BLOCK_ID, LockedBlock>>>
      * 
-     * where WORLD_NAME is the World.name(), CHUNK_ID is the result of
+     * where WORLD_NAME is the Utils.ID.getWorldId(World), CHUNK_ID is the result of
      * Utils.ID.getChunkId(Chunk) and BLOCK_ID is the result of
      * Utils.ID.getLockedBlockId(LockedBlock)
      */
@@ -75,6 +75,24 @@ public class Data {
      */
     public boolean addPlayer(Player player) {
         return addPlayer(new PlayerData(player.getUniqueId()));
+    }
+
+    /**
+     * Clears the players list
+     */
+    public boolean clearPlayers() {
+        try {
+            File basePath = Utils.FS.getOrCreateDir(CodeLock.getDataFolderPath().toString());
+            File playersDir = Utils.FS.getOrCreateDir(basePath.toString(), PATH_PLAYERS);
+            if (!deleteDirectory(playersDir)) {
+                throw new Exception("Couldn't delete the players directory");
+            }
+            players.clear();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -130,6 +148,68 @@ public class Data {
      */
     public boolean addBlock(Block block) {
         return addBlock(new LockedBlock(block));
+    }
+
+    public LockedBlock removeBlock(String world, String chunk, String id) {
+        LockedBlock lockedBlock = getLockedBlock(world, chunk, id);
+
+        if (lockedBlock == null) {
+            return null;
+        }
+
+        return blocks.get(world).get(chunk).remove(id);
+    }
+
+    /**
+     * Clears the blocks list
+     */
+    public boolean clearBlocks() {
+        try {
+            File basePath = Utils.FS.getOrCreateDir(CodeLock.getDataFolderPath().toString());
+            File lockedBlocksDir = Utils.FS.getOrCreateDir(basePath.toString(), PATH_LOCKEDBLOCKS);
+            if (!deleteDirectory(lockedBlocksDir)) {
+                throw new Exception("Couldn't delete the locked blocks directory");
+            }
+            blocks.clear();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Gets the LockedBlock associated with the passed block, if any.
+     * 
+     * @param block The block from which the LockedBlock should be retrieved
+     * @return The associated LockedBlock or `null` if none is found
+     */
+    public LockedBlock getLockedBlock(Block block) {
+        HashMap<String, HashMap<String, LockedBlock>> world = blocks.get(Utils.ID.getWorldId(block.getWorld()));
+        if (world == null) {
+            return null;
+        }
+
+        HashMap<String, LockedBlock> chunk = world.get(Utils.ID.getChunkId(block.getChunk()));
+        if (chunk == null) {
+            return null;
+        }
+
+        return chunk.get(Utils.ID.getLockedBlockId(block));
+    }
+
+    public LockedBlock getLockedBlock(String world, String chunk, String id) {
+        HashMap<String, HashMap<String, LockedBlock>> w = blocks.get(world);
+        if (w == null) {
+            return null;
+        }
+
+        HashMap<String, LockedBlock> c = w.get(chunk);
+        if (c == null) {
+            return null;
+        }
+
+        return c.get(id);
     }
 
     /**
@@ -272,5 +352,16 @@ public class Data {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private boolean deleteDirectory(File dir) throws Exception {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                deleteDirectory(file);
+            }
+        }
+
+        return dir.delete();
     }
 }

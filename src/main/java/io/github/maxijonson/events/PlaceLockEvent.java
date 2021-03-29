@@ -1,17 +1,20 @@
 package io.github.maxijonson.events;
 
-import java.util.ArrayList;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
+import io.github.maxijonson.Utils;
 import io.github.maxijonson.data.Data;
+import io.github.maxijonson.data.LockedBlock;
 import io.github.maxijonson.items.CodeLockItem;
 import io.github.maxijonson.items.Item;
 
@@ -21,67 +24,40 @@ import io.github.maxijonson.items.Item;
  * if it can.
  */
 public class PlaceLockEvent implements Listener {
-
-    /**
-     * Materials that could be valid by the default lockable materials criteria but
-     * should be excluded from being lockable.
-     */
-    private static final ArrayList<Material> MATERIAL_BLACKLIST = new ArrayList<Material>() {
-        private static final long serialVersionUID = 1L;
-
-        {
-            add(Material.ACACIA_FENCE);
-            add(Material.BIRCH_FENCE);
-            add(Material.CRIMSON_FENCE);
-            add(Material.DARK_OAK_FENCE);
-            add(Material.JUNGLE_FENCE);
-            add(Material.NETHER_BRICK_FENCE);
-            add(Material.OAK_FENCE);
-            add(Material.SPRUCE_FENCE);
-            add(Material.WARPED_FENCE);
-        }
-    };
-
-    /**
-     * Materials that are not lockable by default but that should be.
-     */
-    private static final ArrayList<Material> MATERIAL_WHITELIST = new ArrayList<Material>() {
-        private static final long serialVersionUID = 1L;
-
-        {
-            // TODO: Add whitelisted Materials as they are discovered
-        }
-    };
-
-    @EventHandler
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public static void onRightClick(PlayerInteractEvent event) {
+        ItemStack item = event.getItem();
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getItem() != null
-                && Item.matchId(event.getItem(), CodeLockItem.ID)) {
-            event.setCancelled(true);
-
-            Player player = event.getPlayer();
-            Block block = event.getClickedBlock();
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && item != null && Item.matchId(item, CodeLockItem.ID)) {
+            Block block = Utils.Entity.getWorkableBlock(event.getClickedBlock());
             Material type = block.getType();
+            Player player = event.getPlayer();
 
-            // Only whitelisted or interactable blocks that have not been blacklisted can
-            // have a code lock
-            if ((!type.isInteractable() && !MATERIAL_WHITELIST.contains(type)) || MATERIAL_BLACKLIST.contains(type)) {
+            // Check if block is lockable
+            if (!LockedBlock.isLockable(block)) {
                 player.sendMessage(String.format("The code lock cannot be placed on this (%s)", type.toString()));
+                event.setUseItemInHand(Result.DENY);
                 return;
             }
 
-            if (!Data.getInstance().addBlock(event.getClickedBlock())) {
+            // Check if there isn't already a lock
+            if (!Data.getInstance().addBlock(block)) {
                 player.sendMessage("This block is already blocked!");
                 return;
             }
-            player.getInventory().removeItem(event.getItem());
-            player.sendMessage("Code lock placed!");
 
-            if (!Data.getInstance().addPlayer(player)) {
-                player.sendMessage(new String[] { "Right click the locked block to set the code",
+            // Remove the item
+            item.setAmount(item.getAmount() - 1);
+            player.sendMessage("Code lock placed! Now set a code to lock it.");
+
+            // Inform the player about CodeLock usage on first place
+            if (Data.getInstance().addPlayer(player)) {
+                player.sendMessage(new String[] { "Right click the locked block while sneaking to set the code",
                         "You can set a default code with " + ChatColor.AQUA + "/codelock default <4-pin>" });
             }
+
+            // Cancel the interaction
+            event.setUseInteractedBlock(Result.DENY);
         }
     }
 }

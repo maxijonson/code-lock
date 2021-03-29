@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -15,6 +16,38 @@ import io.github.maxijonson.Utils;
  */
 public class LockedBlock extends DataEntity<LockedBlock> {
     private static transient final long serialVersionUID = 1L;
+    public static transient final int CODE_LENGTH = 4;
+
+    /**
+     * Materials that could be valid by the default lockable materials criteria but
+     * should be excluded from being lockable.
+     */
+    public static transient final ArrayList<Material> MATERIAL_BLACKLIST = new ArrayList<Material>() {
+        private static final long serialVersionUID = 1L;
+
+        {
+            add(Material.ACACIA_FENCE);
+            add(Material.BIRCH_FENCE);
+            add(Material.CRIMSON_FENCE);
+            add(Material.DARK_OAK_FENCE);
+            add(Material.JUNGLE_FENCE);
+            add(Material.NETHER_BRICK_FENCE);
+            add(Material.OAK_FENCE);
+            add(Material.SPRUCE_FENCE);
+            add(Material.WARPED_FENCE);
+        }
+    };
+
+    /**
+     * Materials that are not lockable by default but that should be.
+     */
+    public static transient final ArrayList<Material> MATERIAL_WHITELIST = new ArrayList<Material>() {
+        private static final long serialVersionUID = 1L;
+
+        {
+            // TODO: Add whitelisted Materials as they are discovered
+        }
+    };
 
     /** Identifying attributes */
     private String world;
@@ -36,7 +69,7 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     private boolean locked = false;
 
     /** The assigned code on the block */
-    private int code = -1;
+    private String code = null;
 
     /** A list of authorized players */
     private ArrayList<UUID> authorized = new ArrayList<>();
@@ -52,21 +85,20 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     }
 
     public LockedBlock(World world, Chunk chunk, int x, int y, int z) {
-        this(world.getEnvironment().name(), Utils.ID.getChunkId(chunk), x, y, z);
+        this(Utils.ID.getWorldId(world), Utils.ID.getChunkId(chunk), x, y, z);
     }
 
     public LockedBlock(Block block) {
         this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ());
     }
 
-    public LockedBlock(World world, Chunk chunk, int x, int y, int z, boolean locked, int code) {
+    public LockedBlock(World world, Chunk chunk, int x, int y, int z, String code) {
         this(world, chunk, x, y, z);
-        this.locked = locked;
-        this.code = code;
+        setCode(code);
     }
 
-    public LockedBlock(Block block, boolean locked, int code) {
-        this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ(), locked, code);
+    public LockedBlock(Block block, String code) {
+        this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ(), code);
     }
 
     /**
@@ -77,13 +109,52 @@ public class LockedBlock extends DataEntity<LockedBlock> {
      *               code)
      * @return Whether the authorization was succesful or not
      */
-    public boolean authorize(Player player, int code) {
-        if (code == this.code) {
+    public boolean authorize(Player player, String code) {
+        // First code entered or block is unlocked. Change code.
+        if (this.code == null || !locked) {
+            setCode(code);
+            return authorize(player, code);
+        }
+
+        // Validate and authorize
+        if (code.equals(this.code)) {
             authorized.add(player.getUniqueId());
             return true;
         }
 
+        // Wrong code
         return false;
+    }
+
+    /**
+     * Removes a player from the authorized list
+     * 
+     * @param player
+     * @return Whether or not the player was found and deauthorized
+     */
+    public boolean deauthorize(Player player) {
+        return authorized.remove(player.getUniqueId());
+    }
+
+    /**
+     * ONLY Checks if the player appears in the authorized list. You should use the
+     * `canInteract` method to prevent access.
+     * 
+     * @param player
+     * @return Whether or not the player appears on the authorized list of the block
+     */
+    public boolean isAuthorized(Player player) {
+        return authorized.contains(player.getUniqueId());
+    }
+
+    /**
+     * Checks if the player should be able to interact with the block normally.
+     * 
+     * @param player
+     * @return Whether or not the player can interact with this block
+     */
+    public boolean canInteract(Player player) {
+        return !locked || isAuthorized(player);
     }
 
     /**
@@ -118,20 +189,32 @@ public class LockedBlock extends DataEntity<LockedBlock> {
         return chunk;
     }
 
-    public int getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    /**
+     * Changes the code of the locked block, locks it and deauthorizes the list of
+     * authorized players
+     */
+    public void setCode(String code) {
         this.code = code;
+        this.locked = true;
+        this.authorized.clear();
     }
 
-    public boolean getLocked() {
+    public boolean isLocked() {
         return this.locked;
     }
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public static boolean isLockable(Block block) {
+        Material material = block.getType();
+        return (material.isInteractable() || MATERIAL_WHITELIST.contains(material))
+                && !MATERIAL_BLACKLIST.contains(material);
     }
 
     @Override

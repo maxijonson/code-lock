@@ -8,11 +8,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import io.github.maxijonson.Utils;
-
 public class CodeLockItem extends Item {
     public static String ID = "codelock";
-    public static String NSK_CODE = ID + ".code";
 
     private static ItemMeta defaultMeta = null;
 
@@ -33,8 +30,6 @@ public class CodeLockItem extends Item {
             List<String> lore = new ArrayList<>();
             lore.add("Locks entities with a code");
             defaultMeta.setLore(lore);
-
-            Utils.Meta.setCustomData(defaultMeta, NSK_CODE, -1);
         }
 
         this.setItemMeta(defaultMeta);
