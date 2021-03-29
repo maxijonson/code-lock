@@ -57,10 +57,10 @@ public class UsageCommand extends CodeLockCommand implements PlayerCommand {
         if (args.length != 1) {
             ArrayList<String> msgs = new ArrayList<>();
             for (Topic topic : topics.values()) {
-                msgs.add(String.format("%s%s%s: %s%s", ChatColor.YELLOW, topic.name, ChatColor.RESET, ChatColor.GRAY,
+                msgs.add(String.format("%s%s%s: %s%s", ChatColor.GOLD, topic.name, ChatColor.YELLOW, ChatColor.AQUA,
                         topic.description));
             }
-            player.sendMessage((String[]) msgs.toArray());
+            player.sendMessage(msgs.toArray(new String[0]));
             return true;
         }
         String topicName = args[0];
@@ -73,11 +73,13 @@ public class UsageCommand extends CodeLockCommand implements PlayerCommand {
 
         ArrayList<String> msgs = new ArrayList<>();
 
+        msgs.add(ChatColor.GOLD + topic.name.toUpperCase() + ":");
         for (int i = 0; i < topic.steps.length; ++i) {
-            msgs.add(String.format("%s%d: %s%s", ChatColor.AQUA, i, ChatColor.RESET, topic.steps[i]));
+            msgs.add(String.format("%s%d%s: %s%s", ChatColor.GOLD, i + 1, ChatColor.YELLOW, ChatColor.AQUA,
+                    topic.steps[i]));
         }
 
-        player.sendMessage((String[]) msgs.toArray());
+        player.sendMessage(msgs.toArray(new String[0]));
 
         return true;
     }

@@ -108,7 +108,7 @@ public class GUIClickEvent implements Listener {
                 LockedBlock lockedBlock = getLockedBlock(contents);
 
                 if (lockedBlock.authorize(player, current)) {
-                    player.sendMessage(ChatColor.GREEN + "Entity unlocked!");
+                    player.sendMessage(ChatColor.GREEN + "You are now authorized!");
                 } else {
                     player.sendMessage(ChatColor.RED + "Wrong code!");
                     player.damage(5);
@@ -140,21 +140,21 @@ public class GUIClickEvent implements Listener {
     private static void setLocked(ItemStack[] contents, boolean locked, Player player) {
         LockedBlock lockedBlock = getLockedBlock(contents);
         lockedBlock.setLocked(locked);
-        player.sendMessage("The entity is now " + (locked ? "locked" : "unlocked"));
+        player.sendMessage(ChatColor.AQUA + "The entity is now " + ChatColor.GOLD + (locked ? "locked" : "unlocked"));
         player.closeInventory();
     }
 
     private static void remove(ItemStack[] contents, Player player) {
         Data.getInstance().removeBlock(getBlockWorld(contents), getBlockChunk(contents), getBlockId(contents));
         player.getInventory().addItem(new CodeLockItem());
-        player.sendMessage("Lock removed");
+        player.sendMessage(ChatColor.AQUA + "Lock removed");
         player.closeInventory();
     }
 
     private static void deauthorize(ItemStack[] contents, Player player) {
         LockedBlock lockedBlock = getLockedBlock(contents);
         lockedBlock.deauthorize(player);
-        player.sendMessage("You were deauthorized from this locked entity");
+        player.sendMessage(ChatColor.AQUA + "You were deauthorized from this locked entity");
         player.closeInventory();
     }
 }

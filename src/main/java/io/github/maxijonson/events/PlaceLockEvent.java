@@ -30,30 +30,31 @@ public class PlaceLockEvent implements Listener {
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && item != null && Item.matchId(item, CodeLockItem.ID)) {
             Block block = Utils.Entity.getWorkableBlock(event.getClickedBlock());
-            Material type = block.getType();
             Player player = event.getPlayer();
 
             // Check if block is lockable
             if (!LockedBlock.isLockable(block)) {
-                player.sendMessage(String.format("The code lock cannot be placed on this (%s)", type.toString()));
+                player.sendMessage(String.format(ChatColor.RED + "Cannot place a lock here"));
                 event.setUseItemInHand(Result.DENY);
                 return;
             }
 
             // Check if there isn't already a lock
             if (!Data.getInstance().addBlock(block)) {
-                player.sendMessage("This block is already blocked!");
+                player.sendMessage(ChatColor.RED + "Already locked!");
                 return;
             }
 
             // Remove the item
             item.setAmount(item.getAmount() - 1);
-            player.sendMessage("Code lock placed! Now set a code to lock it.");
+            player.sendMessage(ChatColor.AQUA + "Code lock placed! Now " + ChatColor.GOLD + "set a code"
+                    + ChatColor.AQUA + "to lock it.");
 
             // Inform the player about CodeLock usage on first place
             if (Data.getInstance().addPlayer(player)) {
-                player.sendMessage(new String[] { "Right click the locked block while sneaking to set the code",
-                        "You can set a default code with " + ChatColor.AQUA + "/codelock default <4-pin>" });
+                player.sendMessage(new String[] {
+                        ChatColor.AQUA + "Right click the locked block while sneaking to set the code", ChatColor.AQUA
+                                + "You can set a default code with " + ChatColor.GOLD + "/codelock default <4-pin>" });
             }
 
             // Cancel the interaction
