@@ -1,7 +1,6 @@
 package io.github.maxijonson.events;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,7 +47,7 @@ public class PlaceLockEvent implements Listener {
             // Remove the item
             item.setAmount(item.getAmount() - 1);
             player.sendMessage(ChatColor.AQUA + "Code lock placed! Now " + ChatColor.GOLD + "set a code"
-                    + ChatColor.AQUA + "to lock it.");
+                    + ChatColor.AQUA + " to lock it.");
 
             // Inform the player about CodeLock usage on first place
             if (Data.getInstance().addPlayer(player)) {

@@ -17,8 +17,9 @@ import net.md_5.bungee.api.ChatColor;
 public class AuthorizeEvent implements Listener {
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
-    public static void onRightClick(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+    public static void onBlockInteract(PlayerInteractEvent event) {
+        Action action = event.getAction();
+        if (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) {
             Block block = Utils.Entity.getWorkableBlock(event.getClickedBlock());
 
             // Not lockable, do nothing
@@ -37,7 +38,7 @@ public class AuthorizeEvent implements Listener {
 
             if (!lockedBlock.canInteract(player)) {
                 event.setUseInteractedBlock(Result.DENY);
-                if (!player.isSneaking()) {
+                if (!player.isSneaking() || action == Action.LEFT_CLICK_BLOCK) {
                     player.sendMessage(ChatColor.RED + "Locked." + ChatColor.GOLD
                             + " Interact with it while sneaking to enter the code.");
                 }
