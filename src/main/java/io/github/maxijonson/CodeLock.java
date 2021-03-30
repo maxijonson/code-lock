@@ -11,6 +11,8 @@ import io.github.maxijonson.events.DamageBlockEvent;
 import io.github.maxijonson.events.GUIClickEvent;
 import io.github.maxijonson.events.OpenGUIEvent;
 import io.github.maxijonson.events.PlaceLockEvent;
+import io.github.maxijonson.events.PlayerJoinEvent;
+import io.github.maxijonson.items.CodeLockItem;
 
 /**
  * CodeLock A Minecraft plugin to add a code lock to various entities.
@@ -35,7 +37,11 @@ public class CodeLock extends JavaPlugin {
 
         Data.getInstance().load();
 
+        // Init recipes
+        CodeLockItem.registerRecipe(this);
+
         // Init events
+        getServer().getPluginManager().registerEvents(new PlayerJoinEvent(), this);
         getServer().getPluginManager().registerEvents(new PlaceLockEvent(), this);
         getServer().getPluginManager().registerEvents(new DamageBlockEvent(), this);
         getServer().getPluginManager().registerEvents(new AuthorizeEvent(), this);
@@ -46,6 +52,7 @@ public class CodeLock extends JavaPlugin {
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.init();
         this.getCommand("codelock").setExecutor(commandManager);
+
     }
 
     @Override

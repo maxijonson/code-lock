@@ -20,7 +20,7 @@ Here are the key features of the plugin, other than just "locking" stuff!
 
 ### Craftable
 
-The lock has a custom crafting recipe that allows everyone to craft them, providing they have the ressources.
+The lock has a custom crafting recipe that allows everyone to craft them, providing they have the ressources. Use the following recipe to craft it.
 
 ### Enter and forget
 
@@ -38,7 +38,7 @@ Set another code that can be given to your friends so they can have access to th
 
 ## Usage
 
-Use the `/codelock usage` command to learn about the different ways you can use the code lock. 
+Use the `/codelock usage` command to learn about the different ways you can use the code lock.
 
 It is also worth mentionning that the only way to change a lock code is to unlock it first (just like in Rust). Keep this in mind, as this could allow sneaky players to change the code before you!
 
@@ -72,3 +72,11 @@ As explained above, guest codes allow limited access to the locked entity. This 
 ### Configuration
 
 As stated multiple times, the whole plugin is designed around Rust's code lock. The first goal of the plugin development was to replicate it. Now that it has been done, it could be interesting for the users to tweak some of this "design". Simple examples of this would be to set a custom code length other than 4 or use the `LockedBlock.WHITELIST` (which has nothing in at the moment) and whitelist items which can't be locked normally.
+
+### Code Lock Cracker
+
+This is just an idea off the top of my head and is more of a COULD rather than a SHOULD. An item which would be significantly costly to make but would allow players to place the cracker on a locked entity, wait a minute or two and break the code lock.
+
+### Code Lock material on remove
+
+This is a rather small detail, but right now the `Material` of the button given when removing a lock is always `OAK_BUTTON` because it uses the default constructor. The `GUIClickEvent` responsible for removing the lock has no way of knowing which `Material` was on the code lock prior to its placement. The solution would be to add a new field to the `LockedBlock` which would persist this kind of information and then we could get it from the `GUIClickEvent`. I've already written two commented lines in `CodeLockItem` that would persist the `Material` type in the `ItemStack` (inside its metadata). This information could be used when placing the code lock and creating the `LockedBlock`. However, I did not want to modify the `LockedBlock` data model just yet.
