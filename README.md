@@ -26,6 +26,9 @@ Here are the key features of the plugin, other than just "locking" stuff!
 
 The lock has a custom crafting recipe that allows everyone to craft them, providing they have the ressources. Use the following recipe to craft it.
 
+![CodeLock Recipe](recipe.png)
+
+_Any button can be used in the middle!_
 ### Enter and forget
 
 Enter the code once when setting the lock and never do it again! The lock will still lock other players who did not enter the code, but you won't even notice it is there. The only time you'll have to re-enter the code is if it changes.
