@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import io.github.maxijonson.commands.CommandManager;
 import io.github.maxijonson.data.Data;
 import io.github.maxijonson.events.AuthorizeEvent;
+import io.github.maxijonson.events.DamageBlockEvent;
 import io.github.maxijonson.events.GUIClickEvent;
 import io.github.maxijonson.events.OpenGUIEvent;
 import io.github.maxijonson.events.PlaceLockEvent;
@@ -36,6 +37,7 @@ public class CodeLock extends JavaPlugin {
 
         // Init events
         getServer().getPluginManager().registerEvents(new PlaceLockEvent(), this);
+        getServer().getPluginManager().registerEvents(new DamageBlockEvent(), this);
         getServer().getPluginManager().registerEvents(new AuthorizeEvent(), this);
         getServer().getPluginManager().registerEvents(new OpenGUIEvent(), this);
         getServer().getPluginManager().registerEvents(new GUIClickEvent(), this);

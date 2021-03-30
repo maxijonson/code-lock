@@ -155,70 +155,73 @@ public class OpenGUIEvent implements Listener {
     public static void onRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && player.isSneaking()) {
-            Block block = Utils.Entity.getWorkableBlock(event.getClickedBlock());
+        // Initial Precondition
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || !player.isSneaking()) {
+            return;
+        }
 
-            // Not lockable, do nothing
-            if (!LockedBlock.isLockable(block)) {
-                return;
-            }
+        Block block = Utils.Entity.getWorkableBlock(event.getClickedBlock());
 
-            LockedBlock lockedBlock = Data.getInstance().getLockedBlock(block);
+        // Not lockable, do nothing
+        if (!LockedBlock.isLockable(block)) {
+            return;
+        }
 
-            // Not locked, do nothing
-            if (lockedBlock == null) {
-                return;
-            }
+        LockedBlock lockedBlock = Data.getInstance().getLockedBlock(block);
 
-            boolean isAuthorized = lockedBlock.isAuthorized(player);
+        // Not locked, do nothing
+        if (lockedBlock == null) {
+            return;
+        }
 
-            // Create an ItemStack of the same type of the LockedBlock with the ID of the
-            // LockedBlock for future reference
-            ItemStack metaItem = new ItemStack(block.getType());
-            Utils.Meta.setCustomData(metaItem, NSK_BLOCKWORLD, PersistentDataType.STRING, lockedBlock.getWorld());
-            Utils.Meta.setCustomData(metaItem, NSK_BLOCKCHUNK, PersistentDataType.STRING, lockedBlock.getChunk());
-            Utils.Meta.setCustomData(metaItem, NSK_BLOCKID, PersistentDataType.STRING, lockedBlock.getId());
+        boolean isAuthorized = lockedBlock.isAuthorized(player);
 
-            Inventory gui = Bukkit.createInventory(player, GUI_SIZE, GUI_TITLE);
-            ItemStack[] guiItems = new ItemStack[GUI_SIZE];
+        // Create an ItemStack of the same type of the LockedBlock with the ID of the
+        // LockedBlock for future reference
+        ItemStack metaItem = new ItemStack(block.getType());
+        Utils.Meta.setCustomData(metaItem, NSK_BLOCKWORLD, PersistentDataType.STRING, lockedBlock.getWorld());
+        Utils.Meta.setCustomData(metaItem, NSK_BLOCKCHUNK, PersistentDataType.STRING, lockedBlock.getChunk());
+        Utils.Meta.setCustomData(metaItem, NSK_BLOCKID, PersistentDataType.STRING, lockedBlock.getId());
 
-            // ItemStack that holds the meta
-            addItem(guiItems, metaItem, GUI_METAITEM_POS);
+        Inventory gui = Bukkit.createInventory(player, GUI_SIZE, GUI_TITLE);
+        ItemStack[] guiItems = new ItemStack[GUI_SIZE];
 
-            // When the block is locked
-            if (lockedBlock.isLocked()) {
-                // Player is authorized
-                if (isAuthorized) {
-                    // Unlock button
-                    addItem(guiItems, GUI_UNLOCK, GUI_LOCK_POS);
+        // ItemStack that holds the meta
+        addItem(guiItems, metaItem, GUI_METAITEM_POS);
 
-                    // Deauthorize button
-                    addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
-                } else { // Player is unauthorized
-                    // Keypad
-                    addItems(guiItems, GUI_KEYPAD);
-                }
-            } else { // Block is unlocked
-                // Player is authorized
-                if (isAuthorized) {
-                    // Lock button
-                    addItem(guiItems, GUI_LOCK, GUI_LOCK_POS);
+        // When the block is locked
+        if (lockedBlock.isLocked()) {
+            // Player is authorized
+            if (isAuthorized) {
+                // Unlock button
+                addItem(guiItems, GUI_UNLOCK, GUI_LOCK_POS);
 
-                    // Deauthorize button
-                    addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
-                }
-
+                // Deauthorize button
+                addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
+            } else { // Player is unauthorized
                 // Keypad
                 addItems(guiItems, GUI_KEYPAD);
+            }
+        } else { // Block is unlocked
+            // Player is authorized
+            if (isAuthorized) {
+                // Lock button
+                addItem(guiItems, GUI_LOCK, GUI_LOCK_POS);
 
-                // Remove button
-                addItem(guiItems, GUI_REMOVE, GUI_REMOVE_POS);
+                // Deauthorize button
+                addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
             }
 
-            gui.setContents(guiItems);
-            player.openInventory(gui);
-            event.setUseInteractedBlock(Result.DENY);
+            // Keypad
+            addItems(guiItems, GUI_KEYPAD);
+
+            // Remove button
+            addItem(guiItems, GUI_REMOVE, GUI_REMOVE_POS);
         }
+
+        gui.setContents(guiItems);
+        player.openInventory(gui);
+        event.setUseInteractedBlock(Result.DENY);
     }
 
 }

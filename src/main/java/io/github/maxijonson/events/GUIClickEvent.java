@@ -27,41 +27,44 @@ public class GUIClickEvent implements Listener {
     public static void onInventoryItemClick(InventoryClickEvent event) {
         InventoryView view = event.getView();
 
-        if (view.getTitle().equals(OpenGUIEvent.GUI_TITLE) && event.getWhoClicked() instanceof Player) {
-            event.setResult(Result.DENY);
-
-            // Don't register double clicks
-            if (event.getClick() == ClickType.DOUBLE_CLICK) {
-                return;
-            }
-
-            int slot = event.getSlot();
-            ItemStack selected = event.getCurrentItem();
-
-            // Nothing selected or ItemStack selected (does nothing but hold metadata)
-            if (selected == null || slot < 0 || slot == OpenGUIEvent.GUI_METAITEM_POS) {
-                return;
-            }
-
-            Inventory inventory = event.getInventory();
-            ItemStack[] contents = inventory.getContents();
-            Player player = (Player) event.getWhoClicked();
-
-            if (selected.getType() == OpenGUIEvent.MENUITEM_KEYPADINPUT) { // Keypad Input
-                keypadInput(selected, contents, player);
-            } else if (selected.getType() == OpenGUIEvent.MENUITEM_CLEAR) { // Clear Input
-                clearInput(contents);
-            } else if (selected.getType() == OpenGUIEvent.MENUITEM_LOCK) { // Lock
-                setLocked(contents, true, player);
-            } else if (selected.getType() == OpenGUIEvent.MENUITEM_UNLOCK) { // Unlock
-                setLocked(contents, false, player);
-            } else if (selected.getType() == OpenGUIEvent.MENUITEM_REMOVE) { // Remove
-                remove(contents, player);
-            } else if (selected.getType() == OpenGUIEvent.MENUITEM_DEAUTHORIZE) { // Deauthorize
-                deauthorize(contents, player);
-            }
-
+        // Initial Precondition
+        if (!view.getTitle().equals(OpenGUIEvent.GUI_TITLE) || !(event.getWhoClicked() instanceof Player)) {
+            return;
         }
+
+        event.setResult(Result.DENY);
+
+        // Don't register double clicks
+        if (event.getClick() == ClickType.DOUBLE_CLICK) {
+            return;
+        }
+
+        int slot = event.getSlot();
+        ItemStack selected = event.getCurrentItem();
+
+        // Nothing selected or ItemStack selected (does nothing but hold metadata)
+        if (selected == null || slot < 0 || slot == OpenGUIEvent.GUI_METAITEM_POS) {
+            return;
+        }
+
+        Inventory inventory = event.getInventory();
+        ItemStack[] contents = inventory.getContents();
+        Player player = (Player) event.getWhoClicked();
+
+        if (selected.getType() == OpenGUIEvent.MENUITEM_KEYPADINPUT) { // Keypad Input
+            keypadInput(selected, contents, player);
+        } else if (selected.getType() == OpenGUIEvent.MENUITEM_CLEAR) { // Clear Input
+            clearInput(contents);
+        } else if (selected.getType() == OpenGUIEvent.MENUITEM_LOCK) { // Lock
+            setLocked(contents, true, player);
+        } else if (selected.getType() == OpenGUIEvent.MENUITEM_UNLOCK) { // Unlock
+            setLocked(contents, false, player);
+        } else if (selected.getType() == OpenGUIEvent.MENUITEM_REMOVE) { // Remove
+            remove(contents, player);
+        } else if (selected.getType() == OpenGUIEvent.MENUITEM_DEAUTHORIZE) { // Deauthorize
+            deauthorize(contents, player);
+        }
+
     }
 
     private static String getBlockWorld(ItemStack[] contents) {

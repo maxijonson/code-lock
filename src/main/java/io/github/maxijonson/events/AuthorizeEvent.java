@@ -16,32 +16,34 @@ import net.md_5.bungee.api.ChatColor;
 
 public class AuthorizeEvent implements Listener {
 
-    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGH)
     public static void onBlockInteract(PlayerInteractEvent event) {
-        Action action = event.getAction();
-        if (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) {
-            Block block = Utils.Entity.getWorkableBlock(event.getClickedBlock());
+        // Initial Precondition
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
 
-            // Not lockable, do nothing
-            if (!LockedBlock.isLockable(block)) {
-                return;
-            }
+        Block block = Utils.Entity.getWorkableBlock(event.getClickedBlock());
 
-            LockedBlock lockedBlock = Data.getInstance().getLockedBlock(block);
+        // Not lockable, do nothing
+        if (!LockedBlock.isLockable(block)) {
+            return;
+        }
 
-            // Not locked, do nothing
-            if (lockedBlock == null) {
-                return;
-            }
+        LockedBlock lockedBlock = Data.getInstance().getLockedBlock(block);
 
-            Player player = event.getPlayer();
+        // Not locked, do nothing
+        if (lockedBlock == null) {
+            return;
+        }
 
-            if (!lockedBlock.canInteract(player)) {
-                event.setUseInteractedBlock(Result.DENY);
-                if (!player.isSneaking() || action == Action.LEFT_CLICK_BLOCK) {
-                    player.sendMessage(ChatColor.RED + "Locked." + ChatColor.GOLD
-                            + " Interact with it while sneaking to enter the code.");
-                }
+        Player player = event.getPlayer();
+
+        if (!lockedBlock.canInteract(player)) {
+            event.setUseInteractedBlock(Result.DENY);
+            if (!player.isSneaking()) {
+                player.sendMessage(ChatColor.RED + "Locked." + ChatColor.GOLD
+                        + " Interact with it while sneaking to enter the code.");
             }
         }
     }
