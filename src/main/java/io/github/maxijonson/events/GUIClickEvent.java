@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.Event.Result;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -28,6 +29,11 @@ public class GUIClickEvent implements Listener {
 
         if (view.getTitle().equals(OpenGUIEvent.GUI_TITLE) && event.getWhoClicked() instanceof Player) {
             event.setResult(Result.DENY);
+
+            // Don't register double clicks
+            if (event.getClick() == ClickType.DOUBLE_CLICK) {
+                return;
+            }
 
             int slot = event.getSlot();
             ItemStack selected = event.getCurrentItem();

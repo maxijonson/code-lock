@@ -28,16 +28,25 @@ public class UsageCommand extends CodeLockCommand implements PlayerCommand {
             put(authorize.name, authorize);
 
             Topic unlock = new Topic("unlock", "Unlock an entity (used to change the code)",
-                    new String[] { "Look at locked entity (on which you are authorized)",
+                    new String[] { "Look at a locked entity (on which you are authorized)",
                             "Sneak + Right click to open the code lock GUI", "Click on the icon labeled 'unlock'" });
             put(unlock.name, unlock);
+
+            Topic lock = new Topic("lock", "Lock an entity (which was previously unlocked)",
+                    new String[] { "Look at an unlocked entity (on which you are authorized)",
+                            "Sneak + Right click to open the code lock GUI", "Click on the icon labeled 'lock'" });
+            put(lock.name, lock);
 
             Topic change = new Topic("change", "Change the code of a code lock",
                     new String[] { "Make sure you unlock the code lock first (see 'usage unlock')",
                             "Sneak + Right click to open the code lock GUI",
-                            "Set the code (entity will lock automatically)" });
+                            "Set the code. Entity will lock automatically and the authorized list will be cleared." });
             put(change.name, change);
 
+            Topic deauthorize = new Topic("deauthorize", "Deauthorize yourself from an entity and lock yourself out",
+                    new String[] { "Sneak + Right click to open the code lock GUI",
+                            "Click on the icon labeled 'lock'" });
+            put(deauthorize.name, deauthorize);
         }
     };
 

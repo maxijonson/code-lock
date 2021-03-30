@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
@@ -15,8 +16,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.Bisected.Half;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.block.data.type.Door;
+import org.bukkit.block.data.type.Bed.Part;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -27,6 +30,29 @@ import io.github.maxijonson.data.LockedBlock;
 public class Utils {
 
     public static class Entity {
+        private static final ArrayList<BlockFace> directions = new ArrayList<BlockFace>() {
+            private static final long serialVersionUID = 1L;
+
+            {
+                add(BlockFace.NORTH);
+                add(BlockFace.EAST);
+                add(BlockFace.SOUTH);
+                add(BlockFace.WEST);
+            }
+        };
+
+        private static BlockFace rotateDirection(BlockFace from, int amount) {
+            int fromIndex = directions.indexOf(from);
+            int toIndex = fromIndex + amount;
+            while (toIndex < 0) {
+                toIndex += directions.size();
+            }
+            while (toIndex > directions.size()) {
+                toIndex -= directions.size();
+            }
+            return directions.get(toIndex);
+        }
+
         /**
          * Useful for entities that span over more than 1 block. This method will return
          * the same block wherever the player interacts with it.
@@ -43,29 +69,15 @@ public class Utils {
                 if (door.getHalf() == Half.TOP) {
                     b = b.getRelative(BlockFace.DOWN);
                 }
-            }
-            if (block.getBlockData() instanceof Chest) {
+            } else if (block.getBlockData() instanceof Bed) {
+                Bed bed = (Bed) b.getBlockData();
+                if (bed.getPart() == Part.FOOT) {
+                    b = b.getRelative(bed.getFacing());
+                }
+            } else if (block.getBlockData() instanceof Chest) {
                 Chest chest = (Chest) b.getBlockData();
-                System.out.println(chest.getFacing());
-
                 if (chest.getType() == Chest.Type.RIGHT) {
-                    BlockFace face = chest.getFacing();
-                    switch (face) {
-                    case NORTH:
-                        b = b.getRelative(BlockFace.WEST);
-                        break;
-                    case WEST:
-                        b = b.getRelative(BlockFace.SOUTH);
-                        break;
-                    case SOUTH:
-                        b = b.getRelative(BlockFace.EAST);
-                        break;
-                    case EAST:
-                        b = b.getRelative(BlockFace.NORTH);
-                        break;
-                    default:
-                        break;
-                    }
+                    b = b.getRelative(rotateDirection(chest.getFacing(), -1));
                 }
             }
             return b;
