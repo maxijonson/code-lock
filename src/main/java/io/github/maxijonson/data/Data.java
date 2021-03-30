@@ -77,6 +77,10 @@ public class Data {
         return addPlayer(new PlayerData(player.getUniqueId()));
     }
 
+    public PlayerData getPlayer(UUID uuid) {
+        return players.get(uuid);
+    }
+
     /**
      * Clears the players list
      */

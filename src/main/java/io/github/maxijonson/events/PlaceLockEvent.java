@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import io.github.maxijonson.Utils;
 import io.github.maxijonson.data.Data;
 import io.github.maxijonson.data.LockedBlock;
+import io.github.maxijonson.data.PlayerData;
 import io.github.maxijonson.items.CodeLockItem;
 import io.github.maxijonson.items.Item;
 
@@ -47,14 +48,30 @@ public class PlaceLockEvent implements Listener {
             player.sendMessage(ChatColor.RED + "Already locked!");
             return;
         }
+        LockedBlock lockedBlock = Data.getInstance().getLockedBlock(block);
 
         // Remove the item
         item.setAmount(item.getAmount() - 1);
-        player.sendMessage(ChatColor.AQUA + "Code lock placed! Now " + ChatColor.GOLD + "set a code" + ChatColor.AQUA
-                + " to lock it.");
+        player.sendMessage(ChatColor.AQUA + "Code lock placed!");
+
+        // Create the PlayerData if needed
+        boolean isNew = Data.getInstance().addPlayer(player);
+        PlayerData playerData = Data.getInstance().getPlayer(player.getUniqueId());
+
+        // Apply the default code, if any
+        String defaultCode = playerData.getDefaultCode();
+        if (defaultCode != null) {
+            lockedBlock.setCode(defaultCode);
+            lockedBlock.authorize(player, defaultCode);
+            player.sendMessage(
+                    ChatColor.AQUA + "Your default code was applied and the entity is " + ChatColor.GOLD + "locked");
+        } else {
+            player.sendMessage(
+                    ChatColor.AQUA + "Now " + ChatColor.GOLD + "set a code" + ChatColor.AQUA + " to lock it.");
+        }
 
         // Inform the player about CodeLock usage on first place
-        if (Data.getInstance().addPlayer(player)) {
+        if (isNew) {
             player.sendMessage(new String[] {
                     ChatColor.AQUA + "Right click the locked block while sneaking to set the code", ChatColor.AQUA
                             + "You can set a default code with " + ChatColor.GOLD + "/codelock default <4-pin>" });
