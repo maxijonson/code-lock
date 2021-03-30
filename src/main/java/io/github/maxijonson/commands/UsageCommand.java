@@ -47,6 +47,11 @@ public class UsageCommand extends CodeLockCommand implements PlayerCommand {
                     new String[] { "Sneak + Right click to open the code lock GUI",
                             "Click on the icon labeled 'lock'" });
             put(deauthorize.name, deauthorize);
+
+            Topic remove = new Topic("remove", "Remove the lock from an entity",
+                    new String[] { "Make sure you unlock the code lock first (see 'usage unlock')",
+                            "Sneak + Right click to open the code lock GUI", "Click on the icon labeled 'remove'" });
+            put(remove.name, remove);
         }
     };
 

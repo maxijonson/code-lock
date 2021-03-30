@@ -73,6 +73,10 @@ public class ClearDataCommand extends CodeLockCommand implements PlayerCommand, 
 
     @Override
     public boolean onCommand(Player player, Command cmd, String label, String[] args) throws CommandException {
+        if (!player.isOp()) {
+            player.sendMessage(ChatColor.RED + "Only OPs can use this command");
+            return true;
+        }
         return onCommand(player, args);
     }
 

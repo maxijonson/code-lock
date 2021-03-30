@@ -54,7 +54,7 @@ public class CommandManager implements CommandExecutor {
         if (args.length == 0) {
             return false;
         }
-        String commandName = args[0];
+        String commandName = args[0].toLowerCase();
         BaseCommand command = null;
         boolean isPlayer = (sender instanceof Player);
 

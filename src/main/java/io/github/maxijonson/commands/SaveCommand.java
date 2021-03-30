@@ -28,6 +28,10 @@ public class SaveCommand extends CodeLockCommand implements PlayerCommand, Serve
 
     @Override
     public boolean onCommand(Player player, Command cmd, String label, String[] args) {
+        if (!player.isOp()) {
+            player.sendMessage(ChatColor.RED + "Only OPs can use this command");
+            return true;
+        }
         save(player);
         return true;
     }
