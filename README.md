@@ -10,6 +10,10 @@ I had just created my first Minecraft server on a Raspberry Pi 4B using Spigot a
 
 This plugin was mostly developped around a personnal need and I later decided it could be interesting to other server owners. However, **at the moment**, the plugin is given as-is and there is little to no configuration possible. Configuration is in the TODO list, but that does not mean it will ever be implemented. That being said, the project is open to contribution to implement these mechanisms, should that interest you.
 
+## Installation
+
+Right now, the plugin is in testing phase for an initial release. Until then, see the `Development` section below to see how to build the archive and install it to your server. When it releases, it will be available like a standard Spigot plugin with the jar already built.
+
 ## Pre-requisites
 
 Code Lock was developped on `Spigot 1.16.5` API, so versions below or above 1.16 could potentially not be compatible.
