@@ -84,7 +84,3 @@ As stated multiple times, the whole plugin is designed around Rust's code lock. 
 ### Code Lock Cracker
 
 This is just an idea off the top of my head and is more of a COULD rather than a SHOULD. An item which would be significantly costly to make but would allow players to place the cracker on a locked entity, wait a minute or two and break the code lock.
-
-### Code Lock material on remove
-
-This is a rather small detail, but right now the `Material` of the button given when removing a lock is always `OAK_BUTTON` because it uses the default constructor. The `GUIClickEvent` responsible for removing the lock has no way of knowing which `Material` was on the code lock prior to its placement. The solution would be to add a new field to the `LockedBlock` which would persist this kind of information and then we could get it from the `GUIClickEvent`. I've already written two commented lines in `CodeLockItem` that would persist the `Material` type in the `ItemStack` (inside its metadata). This information could be used when placing the code lock and creating the `LockedBlock`. However, I did not want to modify the `LockedBlock` data model just yet.

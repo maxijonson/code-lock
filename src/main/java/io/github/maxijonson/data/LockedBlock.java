@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -67,7 +68,10 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     /** A list of authorized players */
     private ArrayList<UUID> authorized = new ArrayList<>();
 
-    public LockedBlock(String world, String chunk, int x, int y, int z) {
+    /** The button material type that was used when placing the lock */
+    private String buttonType = null;
+
+    public LockedBlock(String world, String chunk, int x, int y, int z, String buttonType) {
         this.world = world;
         this.x = x;
         this.y = y;
@@ -75,24 +79,30 @@ public class LockedBlock extends DataEntity<LockedBlock> {
         updateId();
 
         this.chunk = chunk;
+        this.buttonType = buttonType;
+
+        // Shouldn't happen, but just in case
+        if (buttonType == null) {
+            this.buttonType = Material.OAK_BUTTON.name();
+        }
     }
 
-    public LockedBlock(World world, Chunk chunk, int x, int y, int z) {
-        this(Utils.ID.getWorldId(world), Utils.ID.getChunkId(chunk), x, y, z);
+    public LockedBlock(World world, Chunk chunk, int x, int y, int z, String buttonType) {
+        this(Utils.ID.getWorldId(world), Utils.ID.getChunkId(chunk), x, y, z, buttonType);
     }
 
-    public LockedBlock(Block block) {
-        this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ());
+    public LockedBlock(Block block, String buttonType) {
+        this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ(), buttonType);
     }
 
-    public LockedBlock(World world, Chunk chunk, int x, int y, int z, String code) {
-        this(world, chunk, x, y, z);
-        setCode(code);
-    }
+    // public LockedBlock(World world, Chunk chunk, int x, int y, int z, String buttonType) {
+    //     this(world, chunk, x, y, z, buttonType);
+    //     setCode(code);
+    // }
 
-    public LockedBlock(Block block, String code) {
-        this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ(), code);
-    }
+    // public LockedBlock(Block block, String code) {
+    //     this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ(), code);
+    // }
 
     /**
      * Authorizes a player on the locked block, provided the right code
@@ -184,6 +194,10 @@ public class LockedBlock extends DataEntity<LockedBlock> {
 
     public String getCode() {
         return code;
+    }
+
+    public String getButtonType() {
+        return buttonType;
     }
 
     /**

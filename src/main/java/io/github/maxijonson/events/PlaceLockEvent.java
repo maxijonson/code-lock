@@ -10,6 +10,7 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import io.github.maxijonson.Utils;
 import io.github.maxijonson.data.Data;
@@ -43,8 +44,10 @@ public class PlaceLockEvent implements Listener {
             return;
         }
 
+        // Get the type of button of the code lock
+        String type = Utils.Meta.getCustomData(item.getItemMeta(), CodeLockItem.NSK_TYPE, PersistentDataType.STRING);
         // Check if there isn't already a lock
-        if (!Data.getInstance().addBlock(block)) {
+        if (!Data.getInstance().addBlock(block, type)) {
             player.sendMessage(ChatColor.RED + "Already locked!");
             return;
         }

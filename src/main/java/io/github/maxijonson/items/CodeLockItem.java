@@ -11,15 +11,17 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import io.github.maxijonson.Utils;
 
 public class CodeLockItem extends Item {
     public static final String ID = "codelock";
-    // public static final String NSK_TYPE = ID + ".type";
+    public static final String NSK_TYPE = ID + ".type";
     public static final String RECIPE_GROUP = "codelock." + ID;
     public static final HashMap<NamespacedKey, Material> buttons = new HashMap<NamespacedKey, Material>() {
         private static final long serialVersionUID = 1L;
-
         {
             put(NamespacedKey.minecraft(RECIPE_GROUP + "." + "oak"), Material.OAK_BUTTON);
             put(NamespacedKey.minecraft(RECIPE_GROUP + "." + "birch"), Material.BIRCH_BUTTON);
@@ -49,6 +51,10 @@ public class CodeLockItem extends Item {
         this(1, material);
     }
 
+    public CodeLockItem(String material) {
+        this(getMaterial(material));
+    }
+
     public CodeLockItem(int amount, Material material) {
         super(ID, material, amount);
 
@@ -65,8 +71,15 @@ public class CodeLockItem extends Item {
         }
 
         this.setItemMeta(defaultMeta);
-        // Utils.Meta.setCustomData(this, NSK_TYPE, PersistentDataType.STRING,
-        // this.getType().name());
+        Utils.Meta.setCustomData(this, NSK_TYPE, PersistentDataType.STRING, material.name());
+    }
+
+    private static Material getMaterial(String material) {
+        Material m = Material.getMaterial(material);
+        if (m == null) {
+            m = Material.OAK_BUTTON;
+        }
+        return m;
     }
 
     public static void registerRecipe(JavaPlugin plugin) {

@@ -150,8 +150,8 @@ public class Data {
      * @param block The Block (Bukkit) to add
      * @return whether the block was added (new) or not (existing)
      */
-    public boolean addBlock(Block block) {
-        return addBlock(new LockedBlock(block));
+    public boolean addBlock(Block block, String buttonType) {
+        return addBlock(new LockedBlock(block, buttonType));
     }
 
     public LockedBlock removeBlock(String world, String chunk, String id) {

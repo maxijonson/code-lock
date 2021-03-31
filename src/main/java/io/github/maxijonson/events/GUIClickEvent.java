@@ -154,8 +154,9 @@ public class GUIClickEvent implements Listener {
     }
 
     private static void remove(ItemStack[] contents, Player player) {
-        Data.getInstance().removeBlock(getBlockWorld(contents), getBlockChunk(contents), getBlockId(contents));
-        player.getInventory().addItem(new CodeLockItem());
+        LockedBlock lockedBlock = getLockedBlock(contents);
+        Data.getInstance().removeBlock(lockedBlock.getWorld(), lockedBlock.getChunk(), lockedBlock.getId());
+        player.getInventory().addItem(new CodeLockItem(lockedBlock.getButtonType()));
         player.sendMessage(ChatColor.AQUA + "Lock removed");
         player.closeInventory();
     }
