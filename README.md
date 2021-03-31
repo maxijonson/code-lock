@@ -29,6 +29,7 @@ The lock has a custom crafting recipe that allows everyone to craft them, provid
 ![CodeLock Recipe](recipe.png)
 
 _Any button can be used in the middle!_
+
 ### Enter and forget
 
 Enter the code once when setting the lock and never do it again! The lock will still lock other players who did not enter the code, but you won't even notice it is there. The only time you'll have to re-enter the code is if it changes.
@@ -37,7 +38,7 @@ Enter the code once when setting the lock and never do it again! The lock will s
 
 Locked entites automatically have protection against _direct_ damage from unauthorized players. This means that fire and explosions will still destroy the entity.
 
-_Note: although the entity itself is protected, any other blocks around it are not. This means that a locked door can be bypassed by simply breaking another block to get through (or even break the block under the door!). That said, a grief plugin should be used in conjunction to this plugin!_
+_Note: although the entity itself is protected, any other blocks around it are not. This means that a locked door can be bypassed by simply breaking another block to get through (or even break the block under the door!). That said, a grief plugin should be used in conjunction with this plugin!_
 
 ### Guest codes (Not yet available)
 
@@ -51,7 +52,7 @@ It is also worth mentionning that the only way to change a lock code is to unloc
 
 ## Development
 
-If you wish to work on this plugin, you can follow the steps below. Note that the plugin was tested on a Spigot server, but from what I learned from the forums, Spigot is built on the Bukkit API which is also used by other kind of servers like Paper. That said, the pluggin should technically work on any Bukkit server, but feel free to correct me if I'm wrong as I do not have much experience with Minecraft plugin development.
+If you wish to work on this plugin, you can follow the steps below. Note that the plugin was tested on a Spigot server, but from what I learned from the forums, Spigot is built on the Bukkit API which is also used by other kind of servers like Paper. That said, the plugin should technically work on any Bukkit server, but feel free to correct me if I'm wrong as I do not have much experience with Minecraft plugin development.
 
 1. Clone the repo
 2. Do some modifications
@@ -78,7 +79,7 @@ As explained above, guest codes allow limited access to the locked entity. This 
 
 ### Configuration
 
-As stated multiple times, the whole plugin is designed around Rust's code lock. The first goal of the plugin development was to replicate it. Now that it has been done, it could be interesting for the users to tweak some of this "design". Simple examples of this would be to set a custom code length other than 4 or use the `LockedBlock.WHITELIST` (which has nothing in at the moment) and whitelist items which can't be locked normally.
+As stated multiple times, the whole plugin is designed around Rust's code lock. The first goal of the plugin development was to replicate it. Now that it has been done, it could be interesting for the users to tweak some of this "design". Simple examples of this would be to set a custom code length other than 4 or use the `LockedBlock.BLOCKTYPE_WHITELIST` (which has nothing in at the moment) and whitelist block types which can't be locked normally.
 
 ### Code Lock Cracker
 

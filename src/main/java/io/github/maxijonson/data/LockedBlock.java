@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Fence;
 import org.bukkit.entity.Player;
 
 import io.github.maxijonson.Utils;
@@ -19,33 +20,25 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     public static transient final int CODE_LENGTH = 4;
 
     /**
-     * Materials that could be valid by the default lockable materials criteria but
-     * should be excluded from being lockable.
+     * Block types that could be valid by the default lockable block types criteria
+     * but should be excluded from being lockable.
      */
-    public static transient final ArrayList<Material> MATERIAL_BLACKLIST = new ArrayList<Material>() {
-        private static final long serialVersionUID = 1L;
+    public static transient final ArrayList<Class<? extends BlockData>> BLOCKTYPE_BLACKLIST = new ArrayList<Class<? extends BlockData>>() {
+        private static final long serialVersionUID = 8679858783883943919L;
 
         {
-            add(Material.ACACIA_FENCE);
-            add(Material.BIRCH_FENCE);
-            add(Material.CRIMSON_FENCE);
-            add(Material.DARK_OAK_FENCE);
-            add(Material.JUNGLE_FENCE);
-            add(Material.NETHER_BRICK_FENCE);
-            add(Material.OAK_FENCE);
-            add(Material.SPRUCE_FENCE);
-            add(Material.WARPED_FENCE);
+            add(Fence.class);
         }
     };
 
     /**
-     * Materials that are not lockable by default but that should be.
+     * Block types that are not lockable by default but that should be.
      */
-    public static transient final ArrayList<Material> MATERIAL_WHITELIST = new ArrayList<Material>() {
+    public static transient final ArrayList<Class<? extends BlockData>> BLOCKTYPE_WHITELIST = new ArrayList<Class<? extends BlockData>>() {
         private static final long serialVersionUID = 1L;
 
         {
-            // TODO: Add whitelisted Materials as they are discovered
+            // TODO: Add whitelisted block types as they are discovered
         }
     };
 
@@ -212,9 +205,9 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     }
 
     public static boolean isLockable(Block block) {
-        Material material = block.getType();
-        return (material.isInteractable() || MATERIAL_WHITELIST.contains(material))
-                && !MATERIAL_BLACKLIST.contains(material);
+        Class<? extends BlockData> type = block.getBlockData().getClass();
+        return (block.getType().isInteractable() || BLOCKTYPE_WHITELIST.contains(type))
+                && !BLOCKTYPE_BLACKLIST.contains(type);
     }
 
     @Override
