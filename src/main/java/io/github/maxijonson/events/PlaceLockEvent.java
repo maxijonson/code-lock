@@ -64,7 +64,6 @@ public class PlaceLockEvent implements Listener {
         // Apply the default code, if any
         String defaultCode = playerData.getDefaultCode();
         if (defaultCode != null) {
-            lockedBlock.setCode(defaultCode);
             lockedBlock.authorize(player, defaultCode);
             player.sendMessage(
                     ChatColor.AQUA + "Your default code was applied and the entity is " + ChatColor.GOLD + "locked");

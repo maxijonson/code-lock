@@ -15,7 +15,7 @@ public class LoadCommand extends CodeLockCommand implements PlayerCommand, Serve
     private static LoadCommand instance = null;
 
     private LoadCommand() {
-        super("load", "load", "Loads the plugin data (overwrites the current data)");
+        super("load", "load", "Loads the plugin data (overwrites the current data)", "codelock.command.load");
     }
 
     private void load(CommandSender sender) {
@@ -28,10 +28,6 @@ public class LoadCommand extends CodeLockCommand implements PlayerCommand, Serve
 
     @Override
     public boolean onCommand(Player player, Command cmd, String label, String[] args) {
-        if (!player.isOp()) {
-            player.sendMessage(ChatColor.RED + "Only OPs can use this command");
-            return true;
-        }
         load(player);
         return true;
     }

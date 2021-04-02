@@ -67,12 +67,6 @@ See [CONTRIBUTING](CONTRIBUTING.md)
 
 Here's a list of things I wish to add in the future. They may or may not be implemented, but would reinforce the plugin's accessibility and be more appealing to other server owners.
 
-### Permissions
-
-Currently, obvious commands such as `save`, `load` and `cleardata` are hardcoded to work for OPs (and server) only. All other commands are available for everyone.
-
-Permissions could also be useful to allow OPs (or other groups) to override a lock at any time. However, if I'm an OP and I actively play on my server, I do not want to just open locked doors without even realizing there was a code lock. Sure, this could (and probably should) be an option, but I'd still want to be "locked out" from other players so I can ethically play like others. A button on the GUI that would only be available to OPs is being considered and would allow an OP to authorize himself on the code lock rather than just magically opening everything.
-
 ### Guest codes
 
 As explained above, guest codes allow limited access to the locked entity. This means that the guest cannot control the locked state of the lock, which indirectly means they also can't change the code.
@@ -84,3 +78,7 @@ As stated multiple times, the whole plugin is designed around Rust's code lock. 
 ### Code Lock Cracker
 
 This is just an idea off the top of my head and is more of a COULD rather than a SHOULD. An item which would be significantly costly to make but would allow players to place the cracker on a locked entity, wait a minute or two and break the code lock.
+
+### i18n
+
+Currently, everything is in English. It's common for plugins to be offered in other languages. To achieve this, any English string **that can be displayed to the user** (via message) should be stored in variables that can be dynamically changed.

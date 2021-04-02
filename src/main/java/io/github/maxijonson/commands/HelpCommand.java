@@ -16,7 +16,7 @@ public class HelpCommand extends CodeLockCommand implements PlayerCommand, Serve
     private static HelpCommand instance = null;
 
     private HelpCommand() {
-        super("help", "help [command]", "Shows all available commands or a command's info");
+        super("help", "help [command]", "Shows all available commands or a command's info", "codelock.command.help");
     }
 
     private <T extends BaseCommand> void showHelp(CommandSender sender, ArrayList<T> commands, String[] args) {
@@ -26,7 +26,11 @@ public class HelpCommand extends CodeLockCommand implements PlayerCommand, Serve
 
             for (BaseCommand c : commands) {
                 if (c.getName().equals(search)) {
-                    command = c;
+                    if (!(sender instanceof Player) || c.hasPermission((Player) sender)) {
+                        command = c;
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "You don't have permission to use this command");
+                    }
                     break;
                 }
             }
@@ -42,8 +46,10 @@ public class HelpCommand extends CodeLockCommand implements PlayerCommand, Serve
         ArrayList<String> msg = new ArrayList<>();
 
         for (BaseCommand command : commands) {
-            msg.add(ChatColor.YELLOW + command.getName() + ChatColor.WHITE + ": " + ChatColor.GRAY
-                    + command.getDescription());
+            if (!(sender instanceof Player) || command.hasPermission((Player) sender)) {
+                msg.add(ChatColor.YELLOW + command.getName() + ChatColor.WHITE + ": " + ChatColor.GRAY
+                        + command.getDescription());
+            }
         }
 
         if (msg.size() > 0) {

@@ -1,7 +1,6 @@
 package io.github.maxijonson.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -16,7 +15,7 @@ public class GiveCommand extends CodeLockCommand implements PlayerCommand, Serve
     private static GiveCommand instance = null;
 
     private GiveCommand() {
-        super("give", "give [player] [amount]", "gives a code lock", "give <player> [amount]");
+        super("give", "give [player] [amount]", "gives a code lock", "codelock.command.give", "give <player> [amount]");
     }
 
     public static GiveCommand getInstance() {
@@ -33,11 +32,6 @@ public class GiveCommand extends CodeLockCommand implements PlayerCommand, Serve
 
     @Override
     public boolean onCommand(Player player, Command cmd, String label, String[] args) throws CommandException {
-        if (!player.isOp()) {
-            player.sendMessage(ChatColor.RED + "Only OPs can use this command");
-            return true;
-        }
-
         int amount = 1;
         Player receiver = player;
 

@@ -95,15 +95,6 @@ public class LockedBlock extends DataEntity<LockedBlock> {
         this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ(), buttonType);
     }
 
-    // public LockedBlock(World world, Chunk chunk, int x, int y, int z, String buttonType) {
-    //     this(world, chunk, x, y, z, buttonType);
-    //     setCode(code);
-    // }
-
-    // public LockedBlock(Block block, String code) {
-    //     this(block.getWorld(), block.getChunk(), block.getX(), block.getY(), block.getZ(), code);
-    // }
-
     /**
      * Authorizes a player on the locked block, provided the right code
      * 
@@ -116,17 +107,30 @@ public class LockedBlock extends DataEntity<LockedBlock> {
         // First code entered or block is unlocked. Change code.
         if (this.code == null || !locked) {
             setCode(code);
-            return authorize(player, code);
+            return authorize(player);
         }
 
         // Validate and authorize
         if (code.equals(this.code)) {
-            authorized.add(player.getUniqueId());
+            authorize(player);
             return true;
         }
 
         // Wrong code
         return false;
+    }
+
+    /**
+     * Authorizes a player on the locked block, without a code
+     * 
+     * @param player
+     * @return true (player will always be authorized)
+     */
+    public boolean authorize(Player player) {
+        if (!authorized.contains(player.getUniqueId())) {
+            authorized.add(player.getUniqueId());
+        }
+        return true;
     }
 
     /**
@@ -157,7 +161,7 @@ public class LockedBlock extends DataEntity<LockedBlock> {
      * @return Whether or not the player can interact with this block
      */
     public boolean canInteract(Player player) {
-        return !locked || isAuthorized(player);
+        return !locked || isAuthorized(player) || player.hasPermission("codelock.authorize.force");
     }
 
     /**

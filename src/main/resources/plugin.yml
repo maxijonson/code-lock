@@ -1,10 +1,13 @@
 name: CodeLock
+description: Allows players to lock entities with a "enter once and forget" code lock
 version: 1.0.0
 main: io.github.maxijonson.CodeLock
 author: MaxiJonson
 website: https://github.com/maxijonson/code-lock
 api-version: 1.16
 api: []
+database: false
+load: POSTWORLD
 
 commands:
   codelock:
@@ -13,3 +16,55 @@ commands:
     send-namespaced: false
     description: The CodeLock plugin command. Use '/codelock help' for more information
     usage: /<command> help
+
+permissions:
+  codelock.*:
+    default: op
+    description: Gives access to all Code Lock permissions
+    children:
+      codelock.command.*: true
+      codelock.authorize.*: false
+  codelock.command.*:
+    default: op
+    description: Gives access to all commands
+    children:
+      codelock.command.give: true
+      codelock.command.load: true
+      codelock.command.save: true
+      codelock.command.cleardata: true
+      codelock.command.default: true
+      codelock.command.help: true
+      codelock.command.usage: true
+  codelock.command.give:
+    description: Gives access to the give command
+    default: op
+  codelock.command.load:
+    description: Gives access to the load command
+    default: op
+  codelock.command.save:
+    description: Gives access to the save command
+    default: op
+  codelock.command.cleardata:
+    description: Gives access to the cleardata command
+    default: op
+  codelock.command.default:
+    description: Gives access to the default command
+    default: true
+  codelock.command.help:
+    description: Gives access to the help command
+    default: true
+  codelock.command.usage:
+    description: Gives access to the usage command
+    default: true
+  codelock.authorize.*:
+    description: Gives a player ways to bypass code locks authorization
+    default: false
+    children:
+      codelock.authorize.guioption: true
+      codelock.authorize.force: true
+  codelock.authorize.guioption:
+    description: Gives an additionnal option in the code lock GUI to authorize without a code
+    default: op
+  codelock.authorize.force:
+    description: Forces authorization on a block upon interaction. In other words, renders the plugin almost non-existent to the player
+    default: false

@@ -1,5 +1,7 @@
 package io.github.maxijonson.commands;
 
+import org.bukkit.entity.Player;
+
 /**
  * Defines methods that should be available on implemented entities
  */
@@ -32,4 +34,12 @@ public interface BaseCommand {
      * @return the usage
      */
     String getServerUsage();
+
+    /**
+     * Whether or not the player is allowed to execute the command
+     * 
+     * @param player
+     * @return
+     */
+    boolean hasPermission(Player player);
 }

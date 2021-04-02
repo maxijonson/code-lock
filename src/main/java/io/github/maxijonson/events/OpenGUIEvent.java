@@ -1,6 +1,8 @@
 package io.github.maxijonson.events;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -35,6 +37,7 @@ public class OpenGUIEvent implements Listener {
     public static final Material MENUITEM_UNLOCK = Material.LIME_STAINED_GLASS_PANE;
     public static final Material MENUITEM_REMOVE = Material.REDSTONE;
     public static final Material MENUITEM_DEAUTHORIZE = Material.OAK_DOOR;
+    public static final Material MENUITEM_FORCEAUTHORIZE = Material.IRON_DOOR;
 
     public static final String GUI_TITLE = ChatColor.DARK_AQUA + "Code Lock";
     public static final String MENUITEM_KEYPADSEQUENCE_EMPTY_TXT = "Empty";
@@ -43,6 +46,7 @@ public class OpenGUIEvent implements Listener {
     public static final String MENUITEM_UNLOCK_TXT = "Unlock";
     public static final String MENUITEM_REMOVE_TXT = "Remove Lock";
     public static final String MENUITEM_DEAUTHORIZE_TXT = "Deauthorize Yourself";
+    public static final String MENUITEM_FORCEAUTHORIZE_TXT = "Force authorization";
 
     public static final int GUI_ROWSIZE = 9;
     public static final int GUI_ROWS = 5;
@@ -54,12 +58,14 @@ public class OpenGUIEvent implements Listener {
     public static final int GUI_LOCK_POS = 15;
     public static final int GUI_REMOVE_POS = GUI_LOCK_POS + GUI_ROWSIZE;
     public static final int GUI_DEAUTHORIZE_POS = GUI_REMOVE_POS + GUI_ROWSIZE;
+    public static final int GUI_FORCEAUTHORIZE_POS = GUI_DEAUTHORIZE_POS + GUI_ROWSIZE;
 
     public static final ItemStack[] GUI_KEYPAD = new ItemStack[GUI_SIZE];
     public static final ItemStack GUI_LOCK = new ItemStack(MENUITEM_LOCK);
     public static final ItemStack GUI_UNLOCK = new ItemStack(MENUITEM_UNLOCK);
     public static final ItemStack GUI_REMOVE = new ItemStack(MENUITEM_REMOVE);
     public static final ItemStack GUI_DEAUTHORIZE = new ItemStack(MENUITEM_DEAUTHORIZE);
+    public static final ItemStack GUI_FORCEAUTHORIZE = new ItemStack(MENUITEM_FORCEAUTHORIZE);
 
     static {
         // Input sequence
@@ -116,6 +122,11 @@ public class OpenGUIEvent implements Listener {
         ItemMeta metaDeauthorize = GUI_DEAUTHORIZE.getItemMeta();
         metaDeauthorize.setDisplayName(MENUITEM_DEAUTHORIZE_TXT);
         GUI_DEAUTHORIZE.setItemMeta(metaDeauthorize);
+
+        // Force authorize button
+        ItemMeta metaForceAuthorize = GUI_FORCEAUTHORIZE.getItemMeta();
+        metaForceAuthorize.setDisplayName(MENUITEM_FORCEAUTHORIZE_TXT);
+        GUI_FORCEAUTHORIZE.setItemMeta(metaForceAuthorize);
     }
 
     /**
@@ -182,6 +193,12 @@ public class OpenGUIEvent implements Listener {
         Utils.Meta.setCustomData(metaItem, NSK_BLOCKWORLD, PersistentDataType.STRING, lockedBlock.getWorld());
         Utils.Meta.setCustomData(metaItem, NSK_BLOCKCHUNK, PersistentDataType.STRING, lockedBlock.getChunk());
         Utils.Meta.setCustomData(metaItem, NSK_BLOCKID, PersistentDataType.STRING, lockedBlock.getId());
+        ItemMeta itemMeta = metaItem.getItemMeta();
+        List<String> itemLore = new ArrayList<String>();
+        itemLore.add(lockedBlock.isLocked() ? ChatColor.RED + "Locked" : ChatColor.GREEN + "Unlocked");
+        itemLore.add(isAuthorized ? ChatColor.GREEN + "Authorized" : ChatColor.RED + "Unauthorized");
+        itemMeta.setLore(itemLore);
+        metaItem.setItemMeta(itemMeta);
 
         Inventory gui = Bukkit.createInventory(player, GUI_SIZE, GUI_TITLE);
         ItemStack[] guiItems = new ItemStack[GUI_SIZE];
@@ -201,6 +218,11 @@ public class OpenGUIEvent implements Listener {
             } else { // Player is unauthorized
                 // Keypad
                 addItems(guiItems, GUI_KEYPAD);
+
+                // Force authorize
+                if (player.hasPermission("codelock.authorize.guioption")) {
+                    addItem(guiItems, GUI_FORCEAUTHORIZE, GUI_FORCEAUTHORIZE_POS);
+                }
             }
         } else { // Block is unlocked
             // Player is authorized
@@ -210,6 +232,11 @@ public class OpenGUIEvent implements Listener {
 
                 // Deauthorize button
                 addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
+            } else {
+                // Force authorize (without changing the code for others or removing the lock)
+                if (lockedBlock.getCode() != null && player.hasPermission("codelock.authorize.guioption")) {
+                    addItem(guiItems, GUI_FORCEAUTHORIZE, GUI_FORCEAUTHORIZE_POS);
+                }
             }
 
             // Keypad

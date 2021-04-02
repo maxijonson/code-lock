@@ -63,7 +63,7 @@ public class UsageCommand extends CodeLockCommand implements PlayerCommand {
     }
 
     private UsageCommand() {
-        super("usage", "usage [topic]", "Shows instructions for the CodeLock");
+        super("usage", "usage [topic]", "Shows instructions for the CodeLock", "codelock.command.usage");
     }
 
     @Override

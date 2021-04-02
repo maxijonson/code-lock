@@ -63,6 +63,8 @@ public class GUIClickEvent implements Listener {
             remove(contents, player);
         } else if (selected.getType() == OpenGUIEvent.MENUITEM_DEAUTHORIZE) { // Deauthorize
             deauthorize(contents, player);
+        } else if (selected.getType() == OpenGUIEvent.MENUITEM_FORCEAUTHORIZE) { // Force Authorize
+            forceAuthorize(contents, player);
         }
 
     }
@@ -165,6 +167,13 @@ public class GUIClickEvent implements Listener {
         LockedBlock lockedBlock = getLockedBlock(contents);
         lockedBlock.deauthorize(player);
         player.sendMessage(ChatColor.AQUA + "You were deauthorized from this locked entity");
+        player.closeInventory();
+    }
+
+    private static void forceAuthorize(ItemStack[] contents, Player player) {
+        LockedBlock lockedBlock = getLockedBlock(contents);
+        lockedBlock.authorize(player);
+        player.sendMessage(ChatColor.GREEN + "You are now authorized!");
         player.closeInventory();
     }
 }

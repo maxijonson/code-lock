@@ -22,7 +22,7 @@ public class ClearDataCommand extends CodeLockCommand implements PlayerCommand, 
 
     private ClearDataCommand() {
         super("cleardata", String.format("cleardata [%s | %s]", TYPE_PLAYERS, TYPE_BLOCKS),
-                "Clears all or specified data in memory");
+                "Clears all or specified data in memory", "codelock.command.cleardata");
     }
 
     public static ClearDataCommand getInstance() {
@@ -73,10 +73,6 @@ public class ClearDataCommand extends CodeLockCommand implements PlayerCommand, 
 
     @Override
     public boolean onCommand(Player player, Command cmd, String label, String[] args) throws CommandException {
-        if (!player.isOp()) {
-            player.sendMessage(ChatColor.RED + "Only OPs can use this command");
-            return true;
-        }
         return onCommand(player, args);
     }
 

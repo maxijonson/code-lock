@@ -61,7 +61,12 @@ public class CommandManager implements CommandExecutor {
         // Find the requested command
         for (BaseCommand c : isPlayer ? playerCommands : serverCommands) {
             if (c.getName().equals(commandName)) {
-                command = c;
+                if (!isPlayer || c.hasPermission((Player) sender)) {
+                    command = c;
+                } else {
+                    sender.sendMessage(ChatColor.RED + "You don't have permission to use this command");
+                    return true;
+                }
                 break;
             }
         }

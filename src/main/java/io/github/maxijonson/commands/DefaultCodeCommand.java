@@ -20,7 +20,7 @@ public class DefaultCodeCommand extends CodeLockCommand implements PlayerCommand
     }
 
     private DefaultCodeCommand() {
-        super("default", "default <4-pin | unset>", "Sets or unsets a default code for code locks");
+        super("default", "default <4-pin | unset>", "Sets or unsets a default code for code locks", "codelock.command.default");
     }
 
     @Override
