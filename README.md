@@ -40,9 +40,9 @@ Locked entites automatically have protection against _direct_ damage from unauth
 
 _Note: although the entity itself is protected, any other blocks around it are not. This means that a locked door can be bypassed by simply breaking another block to get through (or even break the block under the door!). That said, a grief plugin should be used in conjunction with this plugin!_
 
-### Guest codes (Not yet available)
+### Guest codes
 
-Set another code that can be given to your friends so they can have access to the entity. However, guests may not change, unlock or remove the code lock. At any time, the guest code can be removed.
+You can set a guest code for your trusted but not so trusted friends. Guests can interact with the entity, but may not lock/unlock it or change the code.
 
 ## Usage
 
@@ -67,9 +67,9 @@ See [CONTRIBUTING](CONTRIBUTING.md)
 
 Here's a list of things I wish to add in the future. They may or may not be implemented, but would reinforce the plugin's accessibility and be more appealing to other server owners.
 
-### Guest codes
+### Doors
 
-As explained above, guest codes allow limited access to the locked entity. This means that the guest cannot control the locked state of the lock, which indirectly means they also can't change the code.
+Code locks on doors works. However, when not authorized and interacting with it opens them for a fraction of a millisecond (not really, but super briefly). It is fast enough for the user to stay locked out, but not fast enough not to notice it. It would be nice if the door would not open at all and do like chest doesn't open (or make sound).
 
 ### Configuration
 

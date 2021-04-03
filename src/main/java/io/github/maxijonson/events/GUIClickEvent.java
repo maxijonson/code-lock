@@ -1,5 +1,6 @@
 package io.github.maxijonson.events;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,8 +18,8 @@ import org.bukkit.persistence.PersistentDataType;
 import io.github.maxijonson.Utils;
 import io.github.maxijonson.data.Data;
 import io.github.maxijonson.data.LockedBlock;
+import io.github.maxijonson.exceptions.GuestCodeException;
 import io.github.maxijonson.items.CodeLockItem;
-import net.md_5.bungee.api.ChatColor;
 
 public class GUIClickEvent implements Listener {
     public static final Material MENUITEM_KEYPADSEQUENCE_FILLED = Material.GREEN_STAINED_GLASS_PANE;
@@ -34,8 +35,9 @@ public class GUIClickEvent implements Listener {
 
         event.setResult(Result.DENY);
 
-        // Don't register double clicks
-        if (event.getClick() == ClickType.DOUBLE_CLICK) {
+        // Don't register double clicks (prevents triple events) and shift left clicks
+        // (prevents retrieving the buttons in the player's inventory in some cases)
+        if (event.getClick() == ClickType.DOUBLE_CLICK || event.getClick() == ClickType.SHIFT_LEFT) {
             return;
         }
 
@@ -50,21 +52,28 @@ public class GUIClickEvent implements Listener {
         Inventory inventory = event.getInventory();
         ItemStack[] contents = inventory.getContents();
         Player player = (Player) event.getWhoClicked();
+        Material selectedType = selected.getType();
 
-        if (selected.getType() == OpenGUIEvent.MENUITEM_KEYPADINPUT) { // Keypad Input
-            keypadInput(selected, contents, player);
-        } else if (selected.getType() == OpenGUIEvent.MENUITEM_CLEAR) { // Clear Input
+        // FIXME: This is starting to look like a giant 'else if' hell. Introduce Chain
+        // of responsability pattern?
+        if (selectedType == OpenGUIEvent.MENUITEM_KEYPADINPUT
+                || selectedType == OpenGUIEvent.MENUITEM_GUESTKEYPADINPUT) { // Keypad Input
+            keypadInput(selected, contents, player, selectedType == OpenGUIEvent.MENUITEM_GUESTKEYPADINPUT);
+        } else if (selectedType == OpenGUIEvent.MENUITEM_CLEAR) { // Clear Input
             clearInput(contents);
-        } else if (selected.getType() == OpenGUIEvent.MENUITEM_LOCK) { // Lock
+        } else if (selectedType == OpenGUIEvent.MENUITEM_LOCK) { // Lock
             setLocked(contents, true, player);
-        } else if (selected.getType() == OpenGUIEvent.MENUITEM_UNLOCK) { // Unlock
+        } else if (selectedType == OpenGUIEvent.MENUITEM_UNLOCK) { // Unlock
             setLocked(contents, false, player);
-        } else if (selected.getType() == OpenGUIEvent.MENUITEM_REMOVE) { // Remove
+        } else if (selectedType == OpenGUIEvent.MENUITEM_REMOVE) { // Remove
             remove(contents, player);
-        } else if (selected.getType() == OpenGUIEvent.MENUITEM_DEAUTHORIZE) { // Deauthorize
+        } else if (selectedType == OpenGUIEvent.MENUITEM_DEAUTHORIZE) { // Deauthorize
             deauthorize(contents, player);
-        } else if (selected.getType() == OpenGUIEvent.MENUITEM_FORCEAUTHORIZE) { // Force Authorize
+        } else if (selectedType == OpenGUIEvent.MENUITEM_FORCEAUTHORIZE) { // Force Authorize
             forceAuthorize(contents, player);
+        } else if (selectedType == OpenGUIEvent.MENUITEM_MASTERMODE
+                || selectedType == OpenGUIEvent.MENUITEM_GUESTMODE) { // Switch mode
+            switchMode(contents, selectedType == OpenGUIEvent.MENUITEM_GUESTMODE);
         }
 
     }
@@ -89,38 +98,45 @@ public class GUIClickEvent implements Listener {
                 getBlockId(contents));
     }
 
-    private static void keypadInput(ItemStack selected, ItemStack[] contents, Player player) {
+    private static void keypadInput(ItemStack selected, ItemStack[] contents, Player player, boolean isGuest) {
         try {
             // Get which key was selected
             String input = selected.getItemMeta().getDisplayName();
 
             // Find the first empty sequence block and replace it with a filled block
-            String current = "";
+            String code = "";
             for (int i = 0; i < LockedBlock.CODE_LENGTH; ++i) {
                 ItemStack item = contents[OpenGUIEvent.GUI_SEQUENCE_POS + i];
                 if (item == null) {
                     continue;
                 }
                 if (item.getType() == MENUITEM_KEYPADSEQUENCE_FILLED) {
-                    current += item.getItemMeta().getDisplayName();
+                    code += item.getItemMeta().getDisplayName();
                 }
                 if (item.getType() == OpenGUIEvent.MENUITEM_KEYPADSEQUENCE_EMPTY) {
                     item.setType(MENUITEM_KEYPADSEQUENCE_FILLED);
                     ItemMeta meta = item.getItemMeta();
                     meta.setDisplayName(input);
                     item.setItemMeta(meta);
-                    current += input;
+                    code += input;
                     break;
                 }
             }
 
             // If complete, authorize on the locked block
-            if (current.length() == LockedBlock.CODE_LENGTH) {
+            if (code.length() == LockedBlock.CODE_LENGTH) {
                 LockedBlock lockedBlock = getLockedBlock(contents);
 
-                if (lockedBlock.authorize(player, current)) {
+                if (isGuest) { // Setting a new guest code
+                    try {
+                        lockedBlock.setGuestCode(code);
+                        player.sendMessage(ChatColor.GREEN + "Guest code set!");
+                    } catch (GuestCodeException e) {
+                        player.sendMessage(ChatColor.RED + e.getMessage());
+                    }
+                } else if (lockedBlock.authorize(player, code)) { // Authorizing (or setting) the master code
                     player.sendMessage(ChatColor.GREEN + "You are now authorized!");
-                } else {
+                } else { // Wrong code
                     player.sendMessage(ChatColor.RED + "Wrong code!");
                     player.damage(5);
                 }
@@ -172,8 +188,26 @@ public class GUIClickEvent implements Listener {
 
     private static void forceAuthorize(ItemStack[] contents, Player player) {
         LockedBlock lockedBlock = getLockedBlock(contents);
-        lockedBlock.authorize(player);
+        lockedBlock.authorizeMaster(player);
         player.sendMessage(ChatColor.GREEN + "You are now authorized!");
         player.closeInventory();
+    }
+
+    private static void switchMode(ItemStack[] contents, boolean toGuestMode) {
+        Material from = toGuestMode ? OpenGUIEvent.MENUITEM_KEYPADINPUT : OpenGUIEvent.MENUITEM_GUESTKEYPADINPUT;
+        Material to = toGuestMode ? OpenGUIEvent.MENUITEM_GUESTKEYPADINPUT : OpenGUIEvent.MENUITEM_KEYPADINPUT;
+        for (int i = OpenGUIEvent.GUI_KEYPAD_POS; i <= OpenGUIEvent.GUI_KEYPADZERO_POS; i++) {
+            if (contents[i] == null || contents[i].getType() != from) {
+                continue;
+            }
+
+            contents[i].setType(to);
+        }
+        ItemStack modeButton = contents[OpenGUIEvent.GUI_MODE_POS];
+        ItemMeta modeButtonMeta = modeButton.getItemMeta();
+        modeButton.setType(toGuestMode ? OpenGUIEvent.MENUITEM_MASTERMODE : OpenGUIEvent.MENUITEM_GUESTMODE);
+        modeButtonMeta.setDisplayName(
+                toGuestMode ? OpenGUIEvent.MENUITEM_MASTERMODE_TXT : OpenGUIEvent.MENUITEM_GUESTMODE_TXT);
+        modeButton.setItemMeta(modeButtonMeta);
     }
 }

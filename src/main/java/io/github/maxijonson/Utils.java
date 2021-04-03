@@ -196,7 +196,6 @@ public class Utils {
         public static NamespacedKey createNamespacedKey(String key) {
             NamespacedKey nsk = new NamespacedKey(CodeLock.getInstance(), key);
             keys.put(key, nsk);
-            Utils.Log.info("Created new key " + key + " (now with " + keys.size() + " keys)");
             return nsk;
         }
 

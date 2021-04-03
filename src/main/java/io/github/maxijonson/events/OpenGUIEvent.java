@@ -25,11 +25,13 @@ import io.github.maxijonson.data.LockedBlock;
 import net.md_5.bungee.api.ChatColor;
 
 public class OpenGUIEvent implements Listener {
+    // Metdata
     public static final String ID = "openguievent";
     public static final String NSK_BLOCKWORLD = ID + ".block.world";
     public static final String NSK_BLOCKCHUNK = ID + ".block.chunk";
     public static final String NSK_BLOCKID = ID + ".block.id";
 
+    // Button icons
     public static final Material MENUITEM_KEYPADINPUT = Material.BLACK_STAINED_GLASS_PANE;
     public static final Material MENUITEM_KEYPADSEQUENCE_EMPTY = Material.BROWN_STAINED_GLASS_PANE;
     public static final Material MENUITEM_CLEAR = Material.BLUE_STAINED_GLASS_PANE;
@@ -38,7 +40,11 @@ public class OpenGUIEvent implements Listener {
     public static final Material MENUITEM_REMOVE = Material.REDSTONE;
     public static final Material MENUITEM_DEAUTHORIZE = Material.OAK_DOOR;
     public static final Material MENUITEM_FORCEAUTHORIZE = Material.IRON_DOOR;
+    public static final Material MENUITEM_GUESTKEYPADINPUT = Material.ORANGE_STAINED_GLASS_PANE;
+    public static final Material MENUITEM_GUESTMODE = Material.SPRUCE_DOOR;
+    public static final Material MENUITEM_MASTERMODE = Material.DARK_OAK_DOOR;
 
+    // Button labels
     public static final String GUI_TITLE = ChatColor.DARK_AQUA + "Code Lock";
     public static final String MENUITEM_KEYPADSEQUENCE_EMPTY_TXT = "Empty";
     public static final String MENUITEM_CLEAR_TXT = "Clear";
@@ -46,26 +52,33 @@ public class OpenGUIEvent implements Listener {
     public static final String MENUITEM_UNLOCK_TXT = "Unlock";
     public static final String MENUITEM_REMOVE_TXT = "Remove Lock";
     public static final String MENUITEM_DEAUTHORIZE_TXT = "Deauthorize Yourself";
-    public static final String MENUITEM_FORCEAUTHORIZE_TXT = "Force authorization";
+    public static final String MENUITEM_FORCEAUTHORIZE_TXT = "Force Authorization";
+    public static final String MENUITEM_GUESTMODE_TXT = "Change Guest Code";
+    public static final String MENUITEM_MASTERMODE_TXT = "Change Master Code";
 
+    // Button positions
     public static final int GUI_ROWSIZE = 9;
     public static final int GUI_ROWS = 5;
     public static final int GUI_SIZE = GUI_ROWSIZE * GUI_ROWS;
-
-    public static final int GUI_KEYPAD_POS = 3;
-    public static final int GUI_SEQUENCE_POS = GUI_KEYPAD_POS;
+    public static final int GUI_SEQUENCE_POS = 3;
+    public static final int GUI_KEYPAD_POS = GUI_SEQUENCE_POS + GUI_ROWSIZE;
+    public static final int GUI_KEYPADZERO_POS = GUI_KEYPAD_POS + 3 * GUI_ROWSIZE;
+    public static final int GUI_CLEAR_POS = GUI_KEYPADZERO_POS + 1;
+    public static final int GUI_MODE_POS = GUI_CLEAR_POS + 1;
     public static final int GUI_METAITEM_POS = GUI_ROWSIZE - 1;
     public static final int GUI_LOCK_POS = 15;
     public static final int GUI_REMOVE_POS = GUI_LOCK_POS + GUI_ROWSIZE;
     public static final int GUI_DEAUTHORIZE_POS = GUI_REMOVE_POS + GUI_ROWSIZE;
     public static final int GUI_FORCEAUTHORIZE_POS = GUI_DEAUTHORIZE_POS + GUI_ROWSIZE;
 
+    // ItemStacks
     public static final ItemStack[] GUI_KEYPAD = new ItemStack[GUI_SIZE];
     public static final ItemStack GUI_LOCK = new ItemStack(MENUITEM_LOCK);
     public static final ItemStack GUI_UNLOCK = new ItemStack(MENUITEM_UNLOCK);
     public static final ItemStack GUI_REMOVE = new ItemStack(MENUITEM_REMOVE);
     public static final ItemStack GUI_DEAUTHORIZE = new ItemStack(MENUITEM_DEAUTHORIZE);
     public static final ItemStack GUI_FORCEAUTHORIZE = new ItemStack(MENUITEM_FORCEAUTHORIZE);
+    public static final ItemStack GUI_GUESTMODE = new ItemStack(MENUITEM_GUESTMODE);
 
     static {
         // Input sequence
@@ -85,23 +98,22 @@ public class OpenGUIEvent implements Listener {
             input.setItemMeta(meta);
             int row = ((GUI_ROWSIZE - i) / 3) * GUI_ROWSIZE;
             int col = (i + 2) % 3;
-            GUI_KEYPAD[GUI_ROWSIZE + GUI_KEYPAD_POS + row + col] = input;
+            GUI_KEYPAD[GUI_KEYPAD_POS + row + col] = input;
         }
 
         // '0' input
-        int zeroPos = GUI_ROWSIZE * (GUI_ROWS - 1) + GUI_KEYPAD_POS;
         ItemStack inputZero = new ItemStack(MENUITEM_KEYPADINPUT);
         ItemMeta metaZero = inputZero.getItemMeta();
         metaZero.setDisplayName("0");
         inputZero.setItemMeta(metaZero);
-        GUI_KEYPAD[zeroPos] = inputZero;
+        GUI_KEYPAD[GUI_KEYPADZERO_POS] = inputZero;
 
         // Clear button
         ItemStack inputClear = new ItemStack(MENUITEM_CLEAR);
         ItemMeta metaClear = inputClear.getItemMeta();
         metaClear.setDisplayName(MENUITEM_CLEAR_TXT);
         inputClear.setItemMeta(metaClear);
-        GUI_KEYPAD[zeroPos + 1] = inputClear;
+        GUI_KEYPAD[GUI_CLEAR_POS] = inputClear;
 
         // Lock button
         ItemMeta metaLock = GUI_LOCK.getItemMeta();
@@ -127,6 +139,11 @@ public class OpenGUIEvent implements Listener {
         ItemMeta metaForceAuthorize = GUI_FORCEAUTHORIZE.getItemMeta();
         metaForceAuthorize.setDisplayName(MENUITEM_FORCEAUTHORIZE_TXT);
         GUI_FORCEAUTHORIZE.setItemMeta(metaForceAuthorize);
+
+        // Guest mode button
+        ItemMeta metaGuestMode = GUI_GUESTMODE.getItemMeta();
+        metaGuestMode.setDisplayName(MENUITEM_GUESTMODE_TXT);
+        GUI_GUESTMODE.setItemMeta(metaGuestMode);
     }
 
     /**
@@ -185,7 +202,8 @@ public class OpenGUIEvent implements Listener {
             return;
         }
 
-        boolean isAuthorized = lockedBlock.isAuthorized(player);
+        boolean isMaster = lockedBlock.isMaster(player);
+        boolean isGuest = !isMaster && lockedBlock.isGuest(player);
 
         // Create an ItemStack of the same type of the LockedBlock with the ID of the
         // LockedBlock for future reference
@@ -196,7 +214,13 @@ public class OpenGUIEvent implements Listener {
         ItemMeta itemMeta = metaItem.getItemMeta();
         List<String> itemLore = new ArrayList<String>();
         itemLore.add(lockedBlock.isLocked() ? ChatColor.RED + "Locked" : ChatColor.GREEN + "Unlocked");
-        itemLore.add(isAuthorized ? ChatColor.GREEN + "Authorized" : ChatColor.RED + "Unauthorized");
+        if (isMaster) {
+            itemLore.add(ChatColor.GREEN + "Authorized");
+        } else if (isGuest) {
+            itemLore.add(ChatColor.BLUE + "Guest");
+        } else {
+            itemLore.add(ChatColor.RED + "Unauthorized");
+        }
         itemMeta.setLore(itemLore);
         metaItem.setItemMeta(itemMeta);
 
@@ -208,11 +232,14 @@ public class OpenGUIEvent implements Listener {
 
         // When the block is locked
         if (lockedBlock.isLocked()) {
-            // Player is authorized
-            if (isAuthorized) {
+            // Player is master
+            if (isMaster) {
                 // Unlock button
                 addItem(guiItems, GUI_UNLOCK, GUI_LOCK_POS);
 
+                // Deauthorize button
+                addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
+            } else if (isGuest) {
                 // Deauthorize button
                 addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
             } else { // Player is unauthorized
@@ -226,10 +253,16 @@ public class OpenGUIEvent implements Listener {
             }
         } else { // Block is unlocked
             // Player is authorized
-            if (isAuthorized) {
+            if (isMaster) {
                 // Lock button
                 addItem(guiItems, GUI_LOCK, GUI_LOCK_POS);
 
+                // Deauthorize button
+                addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
+
+                // Guest Mode button
+                addItem(guiItems, GUI_GUESTMODE, GUI_MODE_POS);
+            } else if (isGuest) {
                 // Deauthorize button
                 addItem(guiItems, GUI_DEAUTHORIZE, GUI_DEAUTHORIZE_POS);
             } else {

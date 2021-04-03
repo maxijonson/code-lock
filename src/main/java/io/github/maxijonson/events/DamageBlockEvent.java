@@ -29,7 +29,7 @@ public class DamageBlockEvent implements Listener {
         }
 
         // Player is not authorized to destroy the block
-        if (!lockedBlock.isAuthorized(player)) {
+        if (!lockedBlock.isMaster(player)) {
             player.sendMessage(ChatColor.RED + "You are not authorized to damage or destroy this locked block");
             return true;
         }

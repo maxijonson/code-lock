@@ -12,6 +12,7 @@ import org.bukkit.block.data.type.Fence;
 import org.bukkit.entity.Player;
 
 import io.github.maxijonson.Utils;
+import io.github.maxijonson.exceptions.GuestCodeException;
 
 /**
  * Represents a block in a world where the block has a code lock placed.
@@ -63,10 +64,16 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     private boolean locked = false;
 
     /** The assigned code on the block */
-    private String code = null;
+    private String masterCode = null;
+
+    /** The assigned guest code on the block */
+    private String guestCode = null;
 
     /** A list of authorized players */
-    private ArrayList<UUID> authorized = new ArrayList<>();
+    private ArrayList<UUID> masters = new ArrayList<>();
+
+    /** A list of the authorized guest players */
+    private ArrayList<UUID> guests = new ArrayList<>();
 
     /** The button material type that was used when placing the lock */
     private String buttonType = null;
@@ -105,14 +112,20 @@ public class LockedBlock extends DataEntity<LockedBlock> {
      */
     public boolean authorize(Player player, String code) {
         // First code entered or block is unlocked. Change code.
-        if (this.code == null || !locked) {
+        if (this.masterCode == null || !locked) {
             setCode(code);
-            return authorize(player);
+            return authorizeMaster(player);
         }
 
-        // Validate and authorize
-        if (code.equals(this.code)) {
-            authorize(player);
+        // Try to authorize as a master
+        if (code.equals(this.masterCode)) {
+            authorizeMaster(player);
+            return true;
+        }
+
+        // Try to authorize as a guest
+        if (this.guestCode != null && code.equals(this.guestCode)) {
+            authorizeGuest(player);
             return true;
         }
 
@@ -121,37 +134,73 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     }
 
     /**
-     * Authorizes a player on the locked block, without a code
+     * Authorizes a player on the locked block as a master, without a code
      * 
      * @param player
      * @return true (player will always be authorized)
      */
-    public boolean authorize(Player player) {
-        if (!authorized.contains(player.getUniqueId())) {
-            authorized.add(player.getUniqueId());
+    public boolean authorizeMaster(Player player) {
+        if (!masters.contains(player.getUniqueId())) {
+            masters.add(player.getUniqueId());
         }
         return true;
     }
 
     /**
-     * Removes a player from the authorized list
+     * Authorizes a player on the locked block as a gues, without a code
+     * 
+     * @param player
+     * @return true (player will always be authorized)
+     */
+    public boolean authorizeGuest(Player player) {
+        if (!guests.contains(player.getUniqueId())) {
+            guests.add(player.getUniqueId());
+        }
+        return true;
+    }
+
+    /**
+     * Removes a player from the authorized list (master or guest)
      * 
      * @param player
      * @return Whether or not the player was found and deauthorized
      */
     public boolean deauthorize(Player player) {
-        return authorized.remove(player.getUniqueId());
+        UUID playerId = player.getUniqueId();
+        return masters.remove(playerId) || guests.remove(playerId);
     }
 
     /**
-     * ONLY Checks if the player appears in the authorized list. You should use the
-     * `canInteract` method to prevent access.
+     * ONLY Checks if the player appears in the list of masters. You should use the
+     * `canInteract` method to prevent or allow access.
      * 
      * @param player
-     * @return Whether or not the player appears on the authorized list of the block
+     * @return Whether or not the player appears on the list of masters of the block
+     */
+    public boolean isMaster(Player player) {
+        return masters.contains(player.getUniqueId());
+    }
+
+    /**
+     * ONLY Checks if the player appears in the list of guests. You should use the
+     * `canInteract` method to prevent or allow access.
+     * 
+     * @param player
+     * @return Whether or not the player appears on the list of guests of the block
+     */
+    public boolean isGuest(Player player) {
+        return guests.contains(player.getUniqueId());
+    }
+
+    /**
+     * ONLY Checks if the player appears on any player list. You should use the
+     * `canInteract` method to prevent or allow access.
+     * 
+     * @param player
+     * @return Whether or not the player appears on the a list of the block
      */
     public boolean isAuthorized(Player player) {
-        return authorized.contains(player.getUniqueId());
+        return isMaster(player) || isGuest(player);
     }
 
     /**
@@ -197,7 +246,7 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     }
 
     public String getCode() {
-        return code;
+        return masterCode;
     }
 
     public String getButtonType() {
@@ -205,13 +254,30 @@ public class LockedBlock extends DataEntity<LockedBlock> {
     }
 
     /**
-     * Changes the code of the locked block, locks it and deauthorizes the list of
-     * authorized players
+     * Changes the code of the locked block, nullifies the guest code, locks it and
+     * deauthorizes the list of authorized players
      */
     public void setCode(String code) {
-        this.code = code;
+        this.masterCode = code;
+        this.guestCode = null;
         this.locked = true;
-        this.authorized.clear();
+        this.masters.clear();
+    }
+
+    /**
+     * Sets a guest code on the block, locks it and deauthorizes the list of guest
+     * players.
+     * 
+     * @throws GuestCodeException if the guest code is the same as the master code
+     */
+    public void setGuestCode(String code) throws GuestCodeException {
+        if (this.masterCode.equals(code)) {
+            throw new GuestCodeException("The guest code may not be the same as the master code");
+        }
+
+        this.guestCode = code;
+        this.locked = true;
+        this.guests.clear();
     }
 
     public boolean isLocked() {
@@ -248,13 +314,13 @@ public class LockedBlock extends DataEntity<LockedBlock> {
             locked = entity.locked;
         }
 
-        if (code != entity.code) {
-            code = entity.code;
+        if (masterCode != entity.masterCode) {
+            masterCode = entity.masterCode;
         }
 
-        if (authorized.size() != entity.authorized.size() || !authorized.containsAll(entity.authorized)) {
-            authorized.clear();
-            authorized.addAll(entity.authorized);
+        if (masters.size() != entity.masters.size() || !masters.containsAll(entity.masters)) {
+            masters.clear();
+            masters.addAll(entity.masters);
         }
     }
 }
