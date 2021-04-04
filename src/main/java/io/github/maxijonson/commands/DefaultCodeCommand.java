@@ -30,7 +30,7 @@ public class DefaultCodeCommand extends CodeLockCommand implements PlayerCommand
         }
 
         String code = args[0];
-        PlayerData playerData = Data.getInstance().getPlayer(player.getUniqueId());
+        PlayerData playerData = Data.getInstance().getPlayerOrCreate(player.getUniqueId());
 
         if (code.equals("unset")) {
             playerData.setDefaultCode(null);

@@ -70,15 +70,34 @@ public class Data {
     /**
      * Adds a PlayerData to the Data players list
      * 
+     * @param player The player's UUID
+     * @return whether the player was added (new) or not (existing)
+     */
+    public boolean addPlayer(UUID uuid) {
+        return addPlayer(new PlayerData(uuid));
+    }
+
+    /**
+     * Adds a PlayerData to the Data players list
+     * 
      * @param player The player (Bukkit) to create the PlayerData from
      * @return whether the player was added (new) or not (existing)
      */
     public boolean addPlayer(Player player) {
-        return addPlayer(new PlayerData(player.getUniqueId()));
+        return addPlayer(player.getUniqueId());
     }
 
     public PlayerData getPlayer(UUID uuid) {
         return players.get(uuid);
+    }
+
+    public PlayerData getPlayerOrCreate(UUID uuid) {
+        PlayerData player = players.get(uuid);
+        if (player == null) {
+            addPlayer(uuid);
+            player = players.get(uuid);
+        }
+        return player;
     }
 
     /**
