@@ -42,8 +42,8 @@ public class AuthorizeEvent implements Listener {
         if (!lockedBlock.canInteract(player)) {
             event.setUseInteractedBlock(Result.DENY);
             if (!player.isSneaking()) {
-                player.sendMessage(ChatColor.RED + "Locked." + ChatColor.GOLD
-                        + " Interact with it while sneaking to enter the code.");
+                player.sendMessage(
+                        ChatColor.RED + "Locked." + ChatColor.GOLD + " Sneak + Right click to enter the code.");
             }
         }
     }
