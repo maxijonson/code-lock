@@ -6,13 +6,23 @@ CodeLock is a Minecraft plugin (and my first plugin made ever!). It allows playe
 
 I had just created my first Minecraft server on a Raspberry Pi 4B using Spigot and wanted to add a plugin that would lock things with a code lock. However, I found it annoying and redundant to enter the code every time, which discouraged the use of the code lock on things I would frequently use. Since I am a huge Rust player, I wanted something similar to their code lock. Thus, CodeLock was born! In fact, this plugin was intentionally designed to work just like it would in Rust.
 
-## Notice for server owners
+## Beta
 
-This plugin was mostly developped around a personnal need and I later decided it could be interesting to other server owners. However, **at the moment**, the plugin is given as-is and there is little to no configuration possible. Configuration is in the TODO list, but that does not mean it will ever be implemented. That being said, the project is open to contribution to implement these mechanisms, should that interest you.
+Code Lock is currently in beta. The plugin is working as expected for now, but some bugs might not have been discovered yet. I recommend using it on smaller servers, like a survival server with your friends! However, you should not **depend** on the Code Lock's reliability just yet! If you encounter problems with a Code Lock and can't remove it for any reason, there is always the `/codelock cleardata` command to wipe **EVERY** code lock.
+
+Please report any bugs or suggestions to the project's [issues](https://github.com/maxijonson/code-lock/issues). Thanks for your contribution!
 
 ## Installation
 
-Right now, the plugin is in testing phase for an initial release. Until then, see the `Development` section below to see how to build the archive and install it to your server. When it releases, it will be available like a standard Spigot plugin with the jar already built.
+You can download the plugin's jar file [here](), but if you wish to create it manually for the Github project, you may follow the "developement" section below.
+
+## Updating
+
+When updating the the plugin, you may or may not need to clear all the Code Lock data.
+
+If you're updating to a **patch** version (e.g: going from `1.0.0` to `1.0.1`), then the data should still be compatible and you might not need to clear data unless specified or if you're experiencing issues after the patch.
+
+If you're updating to a **minor** or a **major** (e.g: going from `1.0.0` to `1.1.0` or `2.0.0`), it is recommended to clear the data. This is because the data model of the plugin could have changed from one version to the other, which would make the data loading fail. You can always try to not clear the data and see if you get any errors when loading the plugin. If you do, then you may need to clear the data.
 
 ## Pre-requisites
 

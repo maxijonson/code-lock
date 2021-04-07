@@ -1,6 +1,6 @@
 name: CodeLock
 description: Allows players to lock entities with an "enter and forget" code lock
-version: 1.0.0
+version: 0.1.0
 main: io.github.maxijonson.CodeLock
 author: MaxiJonson
 website: https://github.com/maxijonson/code-lock
