@@ -14,11 +14,11 @@ Please report any bugs or suggestions to the project's [issues](https://github.c
 
 ## Installation
 
-You can download the plugin's jar file [here](), but if you wish to create it manually for the Github project, you may follow the "developement" section below.
+You can download the plugin's jar file in the [release](https://github.com/maxijonson/code-lock/releases) page of this project, but if you wish to create it manually for the Github project, you may follow the "developement" section below.
 
 ## Updating
 
-When updating the the plugin, you may or may not need to clear all the Code Lock data.
+When updating the plugin, you may or may not need to clear all the Code Lock data.
 
 If you're updating to a **patch** version (e.g: going from `1.0.0` to `1.0.1`), then the data should still be compatible and you might not need to clear data unless specified or if you're experiencing issues after the patch.
 
@@ -26,7 +26,7 @@ If you're updating to a **minor** or a **major** (e.g: going from `1.0.0` to `1.
 
 ## Pre-requisites
 
-Code Lock was developped on `Spigot 1.16.5` API, so versions below or above 1.16 could potentially not be compatible.
+Code Lock was developed on `Spigot 1.16.5` API, so versions below or above 1.16 could potentially not be compatible.
 
 ## Features
 
@@ -34,7 +34,7 @@ Here are the key features of the plugin, other than just "locking" stuff!
 
 ### Craftable
 
-The lock has a custom crafting recipe that allows everyone to craft them, providing they have the ressources. Use the following recipe to craft it.
+The lock has a custom crafting recipe that allows everyone to craft them, providing they have the resources. Use the following recipe to craft it.
 
 ![CodeLock Recipe](recipe.png)
 
@@ -46,19 +46,19 @@ Enter the code once when setting the lock and never do it again! The lock will s
 
 ### Player damage protection
 
-Locked entites automatically have protection against _direct_ damage from unauthorized players. This means that fire and explosions will still destroy the entity.
+Locked entities automatically have protection against _direct_ damage from unauthorized players. This means that fire and explosions will still destroy the entity.
 
 _Note: although the entity itself is protected, any other blocks around it are not. This means that a locked door can be bypassed by simply breaking another block to get through (or even break the block under the door!). That said, a grief plugin should be used in conjunction with this plugin!_
 
 ### Guest codes
 
-You can set a guest code for your trusted but not so trusted friends. Guests can interact with the entity, but may not lock/unlock it or change the code.
+You can set a guest code for your trusted but not-so-trusted friends. Guests can interact with the entity, but may not lock/unlock it or change the code.
 
 ## Usage
 
 Use the `/codelock usage` command to learn about the different ways you can use the code lock.
 
-It is also worth mentionning that the only way to change a lock code is to unlock it first (just like in Rust). Keep this in mind, as this could allow sneaky players to change the code before you!
+It is also worth mentioning that the only way to change a lock code is to unlock it first (just like in Rust). Keep this in mind, as this could allow sneaky players to change the code before you!
 
 ## Development
 
